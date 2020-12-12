@@ -9,7 +9,7 @@ module.exports = {
         new Discord.MessageEmbed()
           .setColor('#ff3864')
           .setDescription(
-            'Please specify whether or not you are available by adding **true** or **false** after ``!keeper available``'
+            'Please specify whether or not you are available by adding **true** or **false** after ``@keeper available``'
           )
       );
     }
@@ -20,7 +20,7 @@ module.exports = {
         new Discord.MessageEmbed()
           .setColor('#ff3864')
           .setDescription(
-            'This command only takes **true** or **false** as sub-commands after ``!keeper available``'
+            'This command only takes **true** or **false** as sub-commands after ``@keeper available``'
           )
       );
     }

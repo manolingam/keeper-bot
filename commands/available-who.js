@@ -8,7 +8,7 @@ module.exports = {
   execute(Discord, message, args) {
     if (args.length < 3) {
       return message.channel.send(
-        `Please specify what role you are looking to search ex. *!keeper available-who wizard*`
+        `Please specify what role you are looking to search ex. *@keeper available-who wizard*`
       );
     }
     const printEmbeddedList = initPrinter(Discord, message);

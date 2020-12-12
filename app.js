@@ -39,7 +39,11 @@ client.on('ready', async () => {
 client.on('message', (message) => {
   if (!message.content.startsWith(PREFIX) || message.author.bot) return;
   if (!message.member.roles.member._roles.includes(process.env.MEMBER_ROLE_ID))
-    return message.channel.send('Access restricted to members.');
+    return message.channel.send(
+      new Discord.MessageEmbed()
+        .setColor('#ff3864')
+        .addFields('Invalid command! Check ``@keeper help``')
+    );
 
   let args = message.content.slice(PREFIX.length).split(/ +/);
   let command = args[1];
@@ -57,7 +61,7 @@ client.on('message', (message) => {
 
       .addFields(HELP_MESSAGE)
       .setFooter(
-        'For more information about a command, use !keeper help <command>'
+        'For more information about a command, use @keeper help <command>'
       );
     return message.channel.send(embed);
   }
@@ -105,8 +109,14 @@ client.on('message', (message) => {
       return client.commands.get('gas-info').execute(Discord, message, axios);
     case 'timezones':
       return client.commands.get('timezones').execute(Discord, message);
+    case 'available-stats':
+      return client.commands.get('available-stats').execute(Discord, message);
     default:
-      return message.channel.send('Invalid command! Check **!keeper help**.');
+      return message.channel.send(
+        new Discord.MessageEmbed()
+          .setColor('#ff3864')
+          .addFields('Invalid command! Check ``@keeper help``')
+      );
   }
 });
 

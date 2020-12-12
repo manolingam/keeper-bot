@@ -21,7 +21,7 @@ module.exports = {
     const TREASURY = `To record a direct transfer into the DAO bank, use **@keeper treasury "brief description" etherscan-link**.`;
     const GAS_INFO = `Returns the live gas price stats.`;
     const TIMEZONES = `Returns the current time in different timezones.`;
-    const AVAILABLE_STATS = `Displays a summary of number of members available for raiding under each role.`;
+    const AVAILABLE_SUMMARY = `Displays a summary of number of members available for raiding under each role.`;
 
     if (args.length < 3)
       return message.channel.send('Missing command! Help with what?');
@@ -79,10 +79,10 @@ module.exports = {
             .setDescription(AVAILABLE_FULL)
             .setColor('#ff3864')
         );
-      case 'available-stats':
+      case 'available-summary':
         return message.channel.send(
           new Discord.MessageEmbed()
-            .setDescription(AVAILABLE_STATS)
+            .setDescription(AVAILABLE_SUMMARY)
             .setColor('#ff3864')
         );
       case 'role-stats':

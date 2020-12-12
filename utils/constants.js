@@ -33,7 +33,7 @@ const HELP_MESSAGE = [
     value: 'Returns available and unavailable guild members by role(s).'
   },
   {
-    name: 'available-stats',
+    name: 'available-summary',
     value:
       'Displays a summary of number of members available for raiding under each role.'
   },

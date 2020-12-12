@@ -109,8 +109,8 @@ client.on('message', (message) => {
       return client.commands.get('gas-info').execute(Discord, message, axios);
     case 'timezones':
       return client.commands.get('timezones').execute(Discord, message);
-    case 'available-stats':
-      return client.commands.get('available-stats').execute(Discord, message);
+    case 'available-summary':
+      return client.commands.get('available-summary').execute(Discord, message);
     default:
       return message.channel.send(
         new Discord.MessageEmbed()

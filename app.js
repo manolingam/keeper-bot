@@ -42,7 +42,7 @@ client.on('message', (message) => {
     return message.channel.send(
       new Discord.MessageEmbed()
         .setColor('#ff3864')
-        .addFields('Invalid command! Check ``@keeper help``')
+        .addFields('Access restricted to members.')
     );
 
   let args = message.content.slice(PREFIX.length).split(/ +/);

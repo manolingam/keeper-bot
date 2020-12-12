@@ -1,7 +1,7 @@
 const { ROLES } = require('../utils/constants');
 
 module.exports = {
-  name: 'available-stats',
+  name: 'available-summary',
   description:
     'Displays a summary of number of members available for raiding under each role.',
   execute(Discord, message) {

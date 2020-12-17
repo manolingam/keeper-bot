@@ -42,7 +42,7 @@ client.on('message', (message) => {
     return message.channel.send(
       new Discord.MessageEmbed()
         .setColor('#ff3864')
-        .addFields('Access restricted to members.')
+        .setDescription('Access restricted to members.')
     );
 
   let args = message.content.slice(PREFIX.length).split(/ +/);
@@ -58,7 +58,6 @@ client.on('message', (message) => {
         'Welcome Guilder. I do a lot of automation for the guild and below are some of my visible executable commands that you can use.'
       )
       .setColor('#ff3864')
-
       .addFields(HELP_MESSAGE)
       .setFooter(
         'For more information about a command, use @keeper help <command>'
@@ -115,7 +114,7 @@ client.on('message', (message) => {
       return message.channel.send(
         new Discord.MessageEmbed()
           .setColor('#ff3864')
-          .addFields('Invalid command! Check ``@keeper help``')
+          .setDescription('Invalid command! Check ``@keeper help``')
       );
   }
 });

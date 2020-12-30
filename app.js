@@ -39,12 +39,12 @@ client.on('ready', async () => {
 // Bot on message
 client.on('message', (message) => {
   if (!message.content.startsWith(PREFIX) || message.author.bot) return;
-  // if (!message.member.roles.member._roles.includes(process.env.MEMBER_ROLE_ID))
-  //   return message.channel.send(
-  //     new Discord.MessageEmbed()
-  //       .setColor('#ff3864')
-  //       .setDescription('Access restricted to members.')
-  //   );
+  if (!message.member.roles.member._roles.includes(process.env.MEMBER_ROLE_ID))
+    return message.channel.send(
+      new Discord.MessageEmbed()
+        .setColor('#ff3864')
+        .setDescription('Access restricted to members.')
+    );
 
   let args = message.content.slice(PREFIX.length).split(/ +/);
   let command = args[1];

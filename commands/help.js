@@ -22,6 +22,8 @@ module.exports = {
     const GAS_INFO = `Returns the live gas price stats.`;
     const TIMEZONES = `Returns the current time in different timezones.`;
     const AVAILABLE_SUMMARY = `Displays a summary of number of members available for raiding under each role.`;
+    const FIND_EMAIL =
+      'Finds the email address of a member with possible matches. Use `@keeper find-email <person-name>`';
 
     if (args.length < 3)
       return message.channel.send('Missing command! Help with what?');
@@ -97,6 +99,12 @@ module.exports = {
           new Discord.MessageEmbed()
 
             .setDescription(INACTIVE_STATS)
+            .setColor('#ff3864')
+        );
+      case 'find-email':
+        return message.channel.send(
+          new Discord.MessageEmbed()
+            .setDescription(FIND_EMAIL)
             .setColor('#ff3864')
         );
       case 'treasury':

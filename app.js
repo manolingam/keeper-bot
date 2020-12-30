@@ -18,6 +18,7 @@ Airtable.configure({
 });
 
 let treasury_base = Airtable.base(process.env.TREASURY_BASE_ID);
+let raidcentral_base = Airtable.base(process.env.RAID_CENTRAL_V2_BASE_ID);
 
 // Command files configuration
 client.commands = new Discord.Collection();
@@ -38,12 +39,12 @@ client.on('ready', async () => {
 // Bot on message
 client.on('message', (message) => {
   if (!message.content.startsWith(PREFIX) || message.author.bot) return;
-  if (!message.member.roles.member._roles.includes(process.env.MEMBER_ROLE_ID))
-    return message.channel.send(
-      new Discord.MessageEmbed()
-        .setColor('#ff3864')
-        .setDescription('Access restricted to members.')
-    );
+  // if (!message.member.roles.member._roles.includes(process.env.MEMBER_ROLE_ID))
+  //   return message.channel.send(
+  //     new Discord.MessageEmbed()
+  //       .setColor('#ff3864')
+  //       .setDescription('Access restricted to members.')
+  //   );
 
   let args = message.content.slice(PREFIX.length).split(/ +/);
   let command = args[1];
@@ -110,6 +111,10 @@ client.on('message', (message) => {
       return client.commands.get('timezones').execute(Discord, message);
     case 'available-summary':
       return client.commands.get('available-summary').execute(Discord, message);
+    case 'find-email':
+      return client.commands
+        .get('find-email')
+        .execute(Discord, message, raidcentral_base, args);
     default:
       return message.channel.send(
         new Discord.MessageEmbed()

@@ -46,6 +46,10 @@ const HELP_MESSAGE = [
     value: 'Returns total inactive members & their usernames.'
   },
   {
+    name: 'find-email',
+    value: 'Finds the email address of a member with possible matches.'
+  },
+  {
     name: 'valhalla',
     value: 'Sends a channel to Valhalla.'
   },

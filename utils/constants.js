@@ -32,14 +32,10 @@ const HELP_MESSAGE = [
     name: 'available-full',
     value: 'Returns available and unavailable guild members by role(s).'
   },
-
   {
-    name: 'valhalla',
-    value: 'Sends a channel to Valhalla.'
-  },
-  {
-    name: 'treasury',
-    value: 'Used to record a direct fund transfer to the guild.'
+    name: 'available-summary',
+    value:
+      'Displays a summary of number of members available for raiding under each role.'
   },
   {
     name: 'role-stats',
@@ -48,6 +44,18 @@ const HELP_MESSAGE = [
   {
     name: 'inactive-stats',
     value: 'Returns total inactive members & their usernames.'
+  },
+  {
+    name: 'find-email',
+    value: 'Finds the email address of a member with possible matches.'
+  },
+  {
+    name: 'valhalla',
+    value: 'Sends a channel to Valhalla.'
+  },
+  {
+    name: 'treasury',
+    value: 'Used to record a direct fund transfer to the guild.'
   },
   {
     name: 'gas-info',
@@ -59,5 +67,74 @@ const HELP_MESSAGE = [
   }
 ];
 
+let ROLES = [
+  { name: 'AngryDwarf', id: process.env.ANGRYDWARF_ID },
+  {
+    name: 'TavernKeeper',
+    id: process.env.TAVERNKEEPER_ID
+  },
+  {
+    name: 'Archer',
+    id: process.env.ARCHER_ID
+  },
+  {
+    name: 'Bard',
+    id: process.env.BARD_ID
+  },
+  {
+    name: 'Cleric',
+    id: process.env.CLERIC_ID
+  },
+  {
+    name: 'Druid',
+    id: process.env.DRUID_ID
+  },
+  {
+    name: 'Healer',
+    id: process.env.HEALER_ID
+  },
+  {
+    name: 'Hunter',
+    id: process.env.HUNTER_ID
+  },
+  {
+    name: 'Warrior',
+    id: process.env.WARRIOR_ID
+  },
+  {
+    name: 'Paladin',
+    id: process.env.PALADIN_ID
+  },
+  {
+    name: 'Monk',
+    id: process.env.MONK_ID
+  },
+  {
+    name: 'Alchemist',
+    id: process.env.ALCHEMIST_ID
+  },
+  {
+    name: 'Necromancer',
+    id: process.env.NECROMANCER_ID
+  },
+  {
+    name: 'Ranger',
+    id: process.env.RANGER_ID
+  },
+  {
+    name: 'Rogue',
+    id: process.env.ROGUE_ID
+  },
+  {
+    name: 'Scribe',
+    id: process.env.SCRIBE_ID
+  },
+  {
+    name: 'Wizard',
+    id: process.env.WIZARD_ID
+  }
+];
+
+exports.ROLES = ROLES;
 exports.PREFIX = PREFIX;
 exports.HELP_MESSAGE = HELP_MESSAGE;

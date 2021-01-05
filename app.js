@@ -18,6 +18,7 @@ Airtable.configure({
 });
 
 let treasury_base = Airtable.base(process.env.TREASURY_BASE_ID);
+let raidcentral_base = Airtable.base(process.env.RAID_CENTRAL_V2_BASE_ID);
 
 // Command files configuration
 client.commands = new Discord.Collection();
@@ -39,7 +40,11 @@ client.on('ready', async () => {
 client.on('message', (message) => {
   if (!message.content.startsWith(PREFIX) || message.author.bot) return;
   if (!message.member.roles.member._roles.includes(process.env.MEMBER_ROLE_ID))
-    return message.channel.send('Access restricted to members.');
+    return message.channel.send(
+      new Discord.MessageEmbed()
+        .setColor('#ff3864')
+        .setDescription('Access restricted to members.')
+    );
 
   let args = message.content.slice(PREFIX.length).split(/ +/);
   let command = args[1];
@@ -54,10 +59,9 @@ client.on('message', (message) => {
         'Welcome Guilder. I do a lot of automation for the guild and below are some of my visible executable commands that you can use.'
       )
       .setColor('#ff3864')
-
       .addFields(HELP_MESSAGE)
       .setFooter(
-        'For more information about a command, use !keeper help <command>'
+        'For more information about a command, use @keeper help <command>'
       );
     return message.channel.send(embed);
   }
@@ -105,8 +109,18 @@ client.on('message', (message) => {
       return client.commands.get('gas-info').execute(Discord, message, axios);
     case 'timezones':
       return client.commands.get('timezones').execute(Discord, message);
+    case 'available-summary':
+      return client.commands.get('available-summary').execute(Discord, message);
+    case 'find-email':
+      return client.commands
+        .get('find-email')
+        .execute(Discord, message, raidcentral_base, args);
     default:
-      return message.channel.send('Invalid command! Check **!keeper help**.');
+      return message.channel.send(
+        new Discord.MessageEmbed()
+          .setColor('#ff3864')
+          .setDescription('Invalid command! Check ``@keeper help``')
+      );
   }
 });
 

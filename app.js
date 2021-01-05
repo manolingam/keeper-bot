@@ -119,7 +119,7 @@ client.on('message', (message) => {
       return message.channel.send(
         new Discord.MessageEmbed()
           .setColor('#ff3864')
-          .setDescription('Invalid command! Check ``@keeper help``')
+          .setDescription('Invalid command! Check _@keeper help_')
       );
   }
 });

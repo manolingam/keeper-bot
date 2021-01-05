@@ -2,15 +2,15 @@
 const createListString = (member) => {
   return `${member.user.username} is ${
     member.roles.cache.has(process.env.AVAILABLE_ROLE_ID)
-      ? "**Available**"
-      : "**Unavailable**"
+      ? '**Available**'
+      : '**Unavailable**'
   }
 `;
 };
 const createField = (label, members) => {
   return {
     name: label,
-    value: members.map((m) => createListString(m)).join(""),
+    value: members.map((m) => createListString(m)).join('')
   };
 };
 const createFields = (label, members) => {
@@ -19,13 +19,16 @@ const createFields = (label, members) => {
   } else {
     return [
       createField(label, members.slice(0, 12)),
-      ...createFields("Cont'd", members.slice(12)),
+      ...createFields("Cont'd", members.slice(12))
     ];
   }
 };
 const initPrinter = (Discord, message) => {
   return ({ title, description, fields }) => {
-    const embed = new Discord.MessageEmbed().setColor("#ff3864").setTimestamp();
+    const embed = new Discord.MessageEmbed()
+      .setColor('#ff3864')
+      .setTimestamp()
+      .setFooter('This message will self destruct in 15 seconds.');
     if (title) {
       embed.setTitle(title);
     }
@@ -35,7 +38,11 @@ const initPrinter = (Discord, message) => {
     if (fields) {
       embed.addFields(fields);
     }
-    message.channel.send(embed);
+    message.channel.send(embed).then((message) => {
+      setTimeout(() => {
+        message.delete();
+      }, 15000);
+    });
   };
 };
 

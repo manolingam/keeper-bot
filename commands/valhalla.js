@@ -3,9 +3,13 @@ module.exports = {
   description: 'Sends a channel to Valhalla.',
   execute(message) {
     if (message.content.split(' ').length < 3)
-      return message.channel.send(
-        'Invalid number of args. Check `@keeper help valhalla`'
-      );
+      return message.channel
+        .send('Invalid number of args. Check `@keeper help valhalla`')
+        .then((message) => {
+          setTimeout(() => {
+            message.delete();
+          }, 5000);
+        });
 
     let channelId = message.content.split(' ')[2];
     channelId = channelId.substring(2, channelId.length - 1);
@@ -21,15 +25,27 @@ module.exports = {
         channel.parentID == process.env.VALHALLA_CHANNEL_ID ||
         channel.parentID == process.env.VALHALLA_9_20_CHANNEL_ID
       ) {
-        message.channel.send('This is already in Valhalla!');
+        message.channel.send('This is already in Valhalla!').then((message) => {
+          setTimeout(() => {
+            message.delete();
+          }, 5000);
+        });
         return;
       }
 
       channel.setParent(category.id);
 
-      message.channel.send('Sent to Valhalla 9/20.');
+      message.channel.send('Sent to Valhalla 9/20.').then((message) => {
+        setTimeout(() => {
+          message.delete();
+        }, 5000);
+      });
     } catch (err) {
-      message.channel.send("Something's not good.");
+      message.channel.send("Something's not good.").then((message) => {
+        setTimeout(() => {
+          message.delete();
+        }, 5000);
+      });
     }
   }
 };

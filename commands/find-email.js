@@ -6,7 +6,11 @@ module.exports = {
       let embed = new Discord.MessageEmbed()
         .setDescription('Missing arguments. Check `@keeper help find-email`')
         .setColor('#ff3864');
-      return message.channel.send(embed);
+      return message.channel.send(embed).then((message) => {
+        setTimeout(() => {
+          message.delete();
+        }, 5000);
+      });
     }
 
     let name = args[2];
@@ -39,9 +43,14 @@ module.exports = {
                 : 'Could not find a match.'
             )
             .setColor('#ff3864')
-            .addFields(results);
+            .addFields(results)
+            .setFooter('This message will self destruct in 15 seconds.');
 
-          message.channel.send(embed);
+          message.channel.send(embed).then((message) => {
+            setTimeout(() => {
+              message.delete();
+            }, 15000);
+          });
         }
       );
   }

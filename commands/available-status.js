@@ -21,7 +21,12 @@ module.exports = {
              ? '``@keeper available false``'
              : '``@keeper available true``'
          }`
-      });
-    message.channel.send(embed);
+      })
+      .setFooter('This message will self destruct in 5 seconds.');
+    message.channel.send(embed).then((message) => {
+      setTimeout(() => {
+        message.delete();
+      }, 5000);
+    });
   }
 };

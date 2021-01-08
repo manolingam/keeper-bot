@@ -37,7 +37,7 @@ client.on('ready', async () => {
   await fetchGasInfo();
   setInterval(async () => {
     await fetchGasInfo();
-  }, 500000);
+  }, 300000);
 });
 
 const fetchGasInfo = async () => {

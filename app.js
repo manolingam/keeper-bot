@@ -46,6 +46,25 @@ client.on('message', (message) => {
         .setDescription('Access restricted to members.')
     );
 
+  let command_center = message.guild.channels.cache.get(
+    process.env.COMMAND_CENTER_ID
+  );
+  if (message.channel.id !== process.env.COMMAND_CENTER_ID)
+    return message.channel
+      .send(
+        new Discord.MessageEmbed()
+          .setColor('#ff3864')
+          .setDescription(
+            `Please use ${command_center} for executing commands.`
+          )
+          .setFooter('Message self destructs in 5s.')
+      )
+      .then((message) => {
+        setTimeout(() => {
+          message.delete();
+        }, 5000);
+      });
+
   let args = message.content.slice(PREFIX.length).split(/ +/);
   let command = args[1];
 

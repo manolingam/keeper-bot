@@ -18,13 +18,10 @@ module.exports = {
       let channel = message.guild.channels.cache.get(channelId);
 
       let category = message.guild.channels.cache.find(
-        (c) => c.name == 'Valhalla 9/20' && c.type == 'category'
+        (c) => c.name == 'Valhalla 1/21' && c.type == 'category'
       );
 
-      if (
-        channel.parentID == process.env.VALHALLA_CHANNEL_ID ||
-        channel.parentID == process.env.VALHALLA_9_20_CHANNEL_ID
-      ) {
+      if (channel.parentID == process.env.VALHALLA_1_21_CHANNEL_ID) {
         message.channel.send('This is already in Valhalla!').then((message) => {
           setTimeout(() => {
             message.delete();
@@ -35,7 +32,7 @@ module.exports = {
 
       channel.setParent(category.id);
 
-      message.channel.send('Sent to Valhalla 9/20.').then((message) => {
+      message.channel.send('Sent to Valhalla 1/21.').then((message) => {
         setTimeout(() => {
           message.delete();
         }, 5000);

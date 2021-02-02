@@ -2,3 +2,4 @@
 .dockerignore
 Dockerfile
 node_modules
+routes.test.rest

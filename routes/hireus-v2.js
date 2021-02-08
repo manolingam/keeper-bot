@@ -114,11 +114,15 @@ HIREUS_V2_ROUTER.post('/consultation', async (req, res) => {
         },
         {
           name: 'Discord',
-          value: discordHandle || 'NaN'
+          value: discordHandle || 'Not Provided'
         },
         {
           name: 'Twitter Handle',
-          value: twitterHandle || 'NaN'
+          value: twitterHandle || 'Not Provided'
+        },
+        {
+          name: 'Telegram Handle',
+          value: telegramHandle || 'Not Provided'
         },
         {
           name: 'Preffered Contact Channel',

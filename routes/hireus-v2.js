@@ -67,56 +67,85 @@ HIREUS_V2_ROUTER.post('/consultation', async (req, res) => {
     }
   );
 
-  // try {
-  //     let Discord = req.DISCORD;
-  //     let embed = new Discord.MessageEmbed()
-  //         .setColor("#ff3864")
-  //         .setTitle(project_name)
-  //         .setURL(`https://etherscan.io/tx/${transaction_hash}`)
-  //         .setAuthor(name)
-  //         .addFields(
-  //             {
-  //                 name: "Project Type",
-  //                 value: project_type,
-  //             },
-  //             {
-  //                 name: "Budget",
-  //                 value: budget,
-  //             },
-  //             {
-  //                 name: "Specs",
-  //                 value: specs,
-  //             },
-  //             {
-  //                 name: "Skills Needed",
-  //                 value: skills_needed,
-  //             },
-  //             {
-  //                 name: "Priorities",
-  //                 value: priorities,
-  //             },
-  //             {
-  //                 name: "Relevant Link",
-  //                 value: link || "NaN",
-  //             },
-  //             {
-  //                 name: "Contact",
-  //                 value: `[${email}][${handle || "NaN"}]`,
-  //             },
-  //             {
-  //                 name: "Expected Delivery Date",
-  //                 value: completion_date || "NaN",
-  //             }
-  //         )
-  //         .setTimestamp();
+  try {
+    let Discord = req.DISCORD;
+    let embed = new Discord.MessageEmbed()
+      .setColor('#ff3864')
+      .setTitle(
+        transaction_hash !== 'not paid'
+          ? 'Paid Submission'
+          : 'Unpaid Submission'
+      )
+      .setURL(
+        transaction_hash !== 'not paid'
+          ? `https://etherscan.io/tx/${transaction_hash}`
+          : null
+      )
+      .setAuthor(name)
+      .addFields(
+        {
+          name: 'Project Name',
+          value: projectName
+        },
+        {
+          name: 'Project Type',
+          value: projectType
+        },
+        {
+          name: 'Specs Link',
+          value: specsLink ? specsLink : 'None Provided'
+        },
 
-  //     req.CLIENT.guilds.cache
-  //         .get(process.env.GUILD_ID)
-  //         .channels.cache.get(process.env.CLIENT_SUBMISSION_CHANNEL_ID)
-  //         .send(embed);
-  // } catch (err) {
-  //     console.log("Error", err);
-  // }
+        {
+          name: 'Budget Range',
+          value: budgetRange
+        },
+        {
+          name: 'Services Required',
+          value: servicesRequired
+        },
+        {
+          name: 'Priority',
+          value: priority
+        },
+        {
+          name: 'Email',
+          value: email
+        },
+        {
+          name: 'Discord',
+          value: discordHandle || 'NaN'
+        },
+        {
+          name: 'Twitter Handle',
+          value: twitterHandle || 'NaN'
+        },
+        {
+          name: 'Preffered Contact Channel',
+          value: contactType
+        }
+      )
+      .setTimestamp();
+
+    req.CLIENT.guilds.cache
+      .get(process.env.GUILD_ID)
+      .channels.cache.get(process.env.CLIENT_SUBMISSION_CHANNEL_ID)
+      .send(embed);
+  } catch (err) {
+    console.log('Error', err);
+
+    let Discord = req.DISCORD;
+    let embed = new Discord.MessageEmbed()
+      .setColor('#ff3864')
+      .setTitle(
+        'Something went wrong with the recent client submission notification. Check airtable for data.'
+      );
+
+    req.CLIENT.guilds.cache
+      .get(process.env.GUILD_ID)
+      .channels.cache.get(process.env.BOT_CENTER_CHANNEL_ID)
+      .send(embed);
+  }
 });
 
 HIREUS_V2_ROUTER.post('/feedback', async (req, res) => {

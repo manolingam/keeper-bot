@@ -22,13 +22,8 @@ module.exports = {
     let embed = new Discord.MessageEmbed()
       .setColor('#ff3864')
       .setTimestamp()
-      .addFields(roles)
-      .setFooter('This message will self destruct in 10 seconds.');
+      .addFields(roles);
 
-    message.channel.send(embed).then((message) => {
-      setTimeout(() => {
-        message.delete();
-      }, 10000);
-    });
+    message.channel.send(embed);
   }
 };

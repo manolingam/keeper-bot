@@ -25,10 +25,8 @@ const createFields = (label, members) => {
 };
 const initPrinter = (Discord, message) => {
   return ({ title, description, fields }) => {
-    const embed = new Discord.MessageEmbed()
-      .setColor('#ff3864')
-      .setTimestamp()
-      .setFooter('This message will self destruct in 15 seconds.');
+    const embed = new Discord.MessageEmbed().setColor('#ff3864').setTimestamp();
+
     if (title) {
       embed.setTitle(title);
     }
@@ -38,11 +36,7 @@ const initPrinter = (Discord, message) => {
     if (fields) {
       embed.addFields(fields);
     }
-    message.channel.send(embed).then((message) => {
-      setTimeout(() => {
-        message.delete();
-      }, 15000);
-    });
+    message.channel.send(embed);
   };
 };
 

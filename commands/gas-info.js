@@ -21,22 +21,12 @@ module.exports = {
               name: 'Safelow',
               value: res.data.safeLow / 10
             }
-          )
-          .setFooter('This message will self destruct in 10 seconds.');
-        message.channel.send(embed).then((message) => {
-          setTimeout(() => {
-            message.delete();
-          }, 10000);
-        });
+          );
+
+        message.channel.send(embed);
       })
       .catch((err) =>
-        message.channel
-          .send(`Something went wrong. Try again later!`)
-          .then((message) => {
-            setTimeout(() => {
-              message.delete();
-            }, 5000);
-          })
+        message.channel.send(`Something went wrong. Try again later!`)
       );
   }
 };

@@ -23,11 +23,13 @@ module.exports = {
       .eachPage(
         function page(records, fetchNextPage) {
           records.forEach(function (record) {
-            if (record.get('Name').toLowerCase().includes(name))
-              results.push({
-                name: record.get('Name'),
-                value: record.get('Email')
-              });
+            if (record.get('Name') !== undefined) {
+              if (record.get('Name').toLowerCase().includes(name))
+                results.push({
+                  name: record.get('Name'),
+                  value: record.get('Email')
+                });
+            }
           });
           fetchNextPage();
         },

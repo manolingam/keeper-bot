@@ -12,43 +12,37 @@ module.exports = {
     let CST = moment().tz('America/Mexico_City').format('LLL');
     let IST = moment().tz('Asia/Kolkata').format('LLL');
 
-    let embed = new Discord.MessageEmbed()
-      .setColor('#ff3864')
-      .addFields(
-        {
-          name: 'America - Los Angeles (PST)',
-          value: PST
-        },
-        {
-          name: 'America - New York (EST)',
-          value: EST
-        },
-        {
-          name: 'America - Denver (MST)',
-          value: MST
-        },
-        {
-          name: 'Australia - Sydney (AEST)',
-          value: AEST
-        },
-        {
-          name: 'Europe - Berlin (CEST)',
-          value: CEST
-        },
-        {
-          name: 'America - Mexico (CST)',
-          value: CST
-        },
-        {
-          name: 'Asia - Kolkata (IST)',
-          value: IST
-        }
-      )
-      .setFooter('This message will self destruct in 10 seconds.');
-    message.channel.send(embed).then((message) => {
-      setTimeout(() => {
-        message.delete();
-      }, 10000);
-    });
+    let embed = new Discord.MessageEmbed().setColor('#ff3864').addFields(
+      {
+        name: 'America - Los Angeles (PST)',
+        value: PST
+      },
+      {
+        name: 'America - New York (EST)',
+        value: EST
+      },
+      {
+        name: 'America - Denver (MST)',
+        value: MST
+      },
+      {
+        name: 'Australia - Sydney (AEST)',
+        value: AEST
+      },
+      {
+        name: 'Europe - Berlin (CEST)',
+        value: CEST
+      },
+      {
+        name: 'America - Mexico (CST)',
+        value: CST
+      },
+      {
+        name: 'Asia - Kolkata (IST)',
+        value: IST
+      }
+    );
+
+    message.channel.send(embed);
   }
 };

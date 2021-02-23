@@ -5,15 +5,9 @@ module.exports = {
     let split = message.content.split('"');
 
     if (split.length < 2 || split[2] === '')
-      return message.channel
-        .send(
-          'Command is not formatted properly! Check **!keeper help treasury**.'
-        )
-        .then((message) => {
-          setTimeout(() => {
-            message.delete();
-          }, 5000);
-        });
+      return message.channel.send(
+        'Command is not formatted properly! Check **!keeper help treasury**.'
+      );
 
     let values = {};
 
@@ -36,11 +30,7 @@ module.exports = {
         }
         records.forEach(function (record) {
           console.log(record.getId());
-          return message.channel.send('Data recorded!').then((message) => {
-            setTimeout(() => {
-              message.delete();
-            }, 5000);
-          });
+          return message.channel.send('Data recorded!');
         });
       }
     );

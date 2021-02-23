@@ -136,15 +136,9 @@ module.exports = {
             .setColor('#ff3864')
         );
       default:
-        return message.channel
-          .send(
-            'No command found on that name. Check `@keeper help` for the list of available commands.'
-          )
-          .then((message) => {
-            setTimeout(() => {
-              message.delete();
-            }, 5000);
-          });
+        return message.channel.send(
+          'No command found on that name. Check `@keeper help` for the list of available commands.'
+        );
     }
   }
 };

@@ -21,12 +21,8 @@ module.exports = {
           name: 'Inactive Members',
           value: members
         }
-      )
-      .setFooter('This message will self destruct in 10 seconds.');
-    message.channel.send(embed).then((message) => {
-      setTimeout(() => {
-        message.delete();
-      }, 10000);
-    });
+      );
+
+    message.channel.send(embed);
   }
 };

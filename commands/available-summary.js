@@ -23,5 +23,12 @@ module.exports = {
         value: `${available} of ${count}`
       });
     });
+
+    let embed = new Discord.MessageEmbed()
+      .setColor('#ff3864')
+      .setTimestamp()
+      .addFields(available_stats);
+
+    message.channel.send(embed);
   }
 };

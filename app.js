@@ -11,6 +11,8 @@ require('dotenv').config();
 const constants = require('./utils/constants');
 const { PREFIX, HELP_MESSAGE } = constants;
 
+const SAIMANO_GUILD_ID = '718367989371633704';
+
 // Airtable Configuration
 Airtable.configure({
   endpointUrl: 'https://api.airtable.com',
@@ -30,9 +32,85 @@ for (const file of commandFiles) {
   client.commands.set(command.name, command);
 }
 
+const getApp = (guildID) => {
+  const app = client.api.applications(client.user.id);
+  if (guildID) {
+    app.guilds(guildID);
+  }
+  return app;
+};
+
+const reply = async (interaction, response) => {
+  let data = {
+    content: response
+  };
+
+  if (typeof response === 'object') {
+    data = await createAPIMessage(interaction, response);
+  }
+
+  client.api.interactions(interaction.id, interaction.token).callback.post({
+    data: {
+      type: 4,
+      data
+    }
+  });
+};
+
+const createAPIMessage = async (interaction, content) => {
+  const { data, files } = await Discord.APIMessage.create(
+    client.channels.resolve(interaction.channel_id),
+    content
+  )
+    .resolveData()
+    .resolveFiles();
+
+  return { ...data, files };
+};
+
 // Bot on ready
 client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`);
+
+  const commands = await getApp(process.env.GUILD_ID).commands.get();
+  console.log(commands);
+
+  await getApp(process.env.GUILD_ID).commands.post({
+    data: {
+      name: 'gas-info',
+      description: 'Returns gas price information'
+    }
+  });
+
+  client.ws.on('INTERACTION_CREATE', async (interaction) => {
+    const { name, options } = interaction.data;
+    const command = name.toLowerCase();
+
+    if (command === 'gas-info') {
+      axios.get('https://ethgasstation.info/api/ethgasAPI.json').then((res) => {
+        let embed = new Discord.MessageEmbed()
+          .setColor('#ff3864')
+          .setTimestamp()
+          .addFields(
+            {
+              name: 'Fast',
+              value: res.data.fast / 10
+            },
+            {
+              name: 'Standard',
+              value: res.data.average / 10
+            },
+            {
+              name: 'Safelow',
+              value: res.data.safeLow / 10
+            }
+          );
+
+        reply(interaction, embed);
+      });
+    }
+  });
+
   require('./server');
   await fetchGasInfo();
   setInterval(async () => {

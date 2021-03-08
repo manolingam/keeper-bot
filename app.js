@@ -72,10 +72,10 @@ const createAPIMessage = async (interaction, content) => {
 client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`);
 
-  const commands = await getApp(SAIMANO_GUILD_ID).commands.get();
+  const commands = await getApp(process.env.GUILD_ID).commands.get();
   console.log(commands);
 
-  await getApp(SAIMANO_GUILD_ID).commands.post({
+  await getApp(process.env.GUILD_ID).commands.post({
     data: {
       name: 'gas-info',
       description: 'Returns gas price information'

@@ -22,6 +22,7 @@ module.exports = {
              : '``@keeper available true``'
          }`
       });
+
     message.channel.send(embed);
   }
 };

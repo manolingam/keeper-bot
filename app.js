@@ -34,7 +34,30 @@ for (const file of commandFiles) {
 client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`);
   require('./server');
+  await fetchGasInfo();
+  setInterval(async () => {
+    await fetchGasInfo();
+  }, 300000);
 });
+
+const fetchGasInfo = async () => {
+  try {
+    let gas_price = await axios.get(
+      'https://ethgasstation.info/api/ethgasAPI.json'
+    );
+    gas_price = gas_price.data.average / 10;
+    let eth_price = await axios.get(
+      'https://api.etherscan.io/api?module=stats&action=ethprice'
+    );
+    eth_price = eth_price.data.result.ethusd;
+    client.user.setPresence({
+      activity: {
+        name: `gas @ ${gas_price} & eth @ $${eth_price}`,
+        type: 'WATCHING'
+      }
+    });
+  } catch (err) {}
+};
 
 // Bot on message
 client.on('message', (message) => {
@@ -45,6 +68,25 @@ client.on('message', (message) => {
         .setColor('#ff3864')
         .setDescription('Access restricted to members.')
     );
+
+  let command_center = message.guild.channels.cache.get(
+    process.env.COMMAND_CENTER_ID
+  );
+  if (message.channel.id !== process.env.COMMAND_CENTER_ID)
+    return message.channel
+      .send(
+        new Discord.MessageEmbed()
+          .setColor('#ff3864')
+          .setDescription(
+            `Please use ${command_center} for executing commands.`
+          )
+          .setFooter('Message self destructs in 5s.')
+      )
+      .then((message) => {
+        setTimeout(() => {
+          message.delete();
+        }, 5000);
+      });
 
   let args = message.content.slice(PREFIX.length).split(/ +/);
   let command = args[1];
@@ -119,7 +161,7 @@ client.on('message', (message) => {
       return message.channel.send(
         new Discord.MessageEmbed()
           .setColor('#ff3864')
-          .setDescription('Invalid command! Check ``@keeper help``')
+          .setDescription('Invalid command! Check _@keeper help_')
       );
   }
 });

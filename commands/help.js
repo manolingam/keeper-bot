@@ -137,7 +137,7 @@ module.exports = {
         );
       default:
         return message.channel.send(
-          "Hmm.. I don't know what that command does. Check `!keeper help`"
+          'No command found on that name. Check `@keeper help` for the list of available commands.'
         );
     }
   }

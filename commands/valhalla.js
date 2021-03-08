@@ -14,20 +14,17 @@ module.exports = {
       let channel = message.guild.channels.cache.get(channelId);
 
       let category = message.guild.channels.cache.find(
-        (c) => c.name == 'Valhalla 9/20' && c.type == 'category'
+        (c) => c.name == 'Valhalla 1/21' && c.type == 'category'
       );
 
-      if (
-        channel.parentID == process.env.VALHALLA_CHANNEL_ID ||
-        channel.parentID == process.env.VALHALLA_9_20_CHANNEL_ID
-      ) {
+      if (channel.parentID == process.env.VALHALLA_1_21_CHANNEL_ID) {
         message.channel.send('This is already in Valhalla!');
         return;
       }
 
       channel.setParent(category.id);
 
-      message.channel.send('Sent to Valhalla 9/20.');
+      message.channel.send('Sent to Valhalla 1/21.');
     } catch (err) {
       message.channel.send("Something's not good.");
     }

@@ -1,32 +1,43 @@
-module.exports = {
-  name: 'valhalla',
-  description: 'Sends a channel to Valhalla.',
-  execute(message) {
-    if (message.content.split(' ').length < 3)
-      return message.channel.send(
-        'Invalid number of args. Check `@keeper help valhalla`'
-      );
+const { MessageEmbed } = require('discord.js');
 
-    let channelId = message.content.split(' ')[2];
+module.exports = {
+  slash: true,
+  testOnly: true,
+  name: 'crypt-this',
+  description: 'Sends a channel to Valhalla.',
+  minArgs: 1,
+  expectedArgs: '<channel>',
+  callback: ({ channel, args }) => {
+    let [channelId] = args;
     channelId = channelId.substring(2, channelId.length - 1);
 
     try {
-      let channel = message.guild.channels.cache.get(channelId);
-
-      let category = message.guild.channels.cache.find(
+      let _channel = channel.guild.channels.cache.get(channelId);
+      let category = channel.guild.channels.cache.find(
         (c) => c.name == 'Valhalla 1/21' && c.type == 'category'
       );
 
-      if (channel.parentID == process.env.VALHALLA_1_21_CHANNEL_ID) {
-        message.channel.send('This is already in Valhalla!');
-        return;
+      if (_channel.parentID == process.env.VALHALLA_1_21_CHANNEL_ID) {
+        let embed = new MessageEmbed()
+          .setColor('#ff3864')
+          .setDescription('This is already in Valhalla!');
+
+        return embed;
       }
 
-      channel.setParent(category.id);
+      _channel.setParent(category.id);
 
-      message.channel.send('Sent to Valhalla 1/21.');
+      let embed = new MessageEmbed()
+        .setColor('#ff3864')
+        .setDescription('Sent to Valhalla 1/21.');
+
+      return embed;
     } catch (err) {
-      message.channel.send("Something's not good.");
+      console.log(err);
+      let embed = new MessageEmbed()
+        .setColor('#ff3864')
+        .setDescription('Invalid Argument.');
+      return embed;
     }
   }
 };

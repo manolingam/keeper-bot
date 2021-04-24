@@ -1,29 +1,32 @@
+const { MessageEmbed } = require('discord.js');
+
 module.exports = {
-  name: 'role-stats',
-  description: 'Returns total members in each role',
-  execute(Discord, message) {
-    let roles = [];
-    let filterRoles = [
-      '@everyone',
-      'nodered',
-      '1up',
-      'Nurevam',
-      'RaidGuild',
-      'Fantastic12',
-      'Simple Poll'
-    ];
-    message.guild.roles.cache.forEach((role) => {
-      if (!filterRoles.includes(role.name)) {
-        let count = message.guild.roles.cache.get(role.id).members.size;
-        roles.push({ name: role.name, value: `${count} people` });
-      }
-    });
+  slash: true,
+  testOnly: true,
+  name: 'all-role-count',
+  description: 'Returns the total number of users in each role.',
+  callback: ({ channel }) => {
+    try {
+      let roles = [];
+      let filterRoles = ['@everyone'];
 
-    let embed = new Discord.MessageEmbed()
-      .setColor('#ff3864')
-      .setTimestamp()
-      .addFields(roles);
+      channel.guild.roles.cache.forEach((role) => {
+        if (!filterRoles.includes(role.name)) {
+          let count = channel.guild.roles.cache.get(role.id).members.size;
+          roles.push({ name: role.name, value: `${count}` });
+        }
+      });
 
-    message.channel.send(embed);
+      let embed = new MessageEmbed()
+        .setColor('#ff3864')
+        .setTimestamp()
+        .addFields(roles);
+
+      return embed;
+    } catch (err) {
+      return new MessageEmbed()
+        .setDescription('Something went wrong!')
+        .setColor('#ff3864');
+    }
   }
 };

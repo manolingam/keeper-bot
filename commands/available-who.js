@@ -1,82 +1,79 @@
-const { initPrinter, createFields } = require('../utils/print-helpers');
-const { TAG_LOOKUP, STR_LOOKUP } = require('../utils/lookup');
+const { TAG_LOOKUP } = require('../utils/lookup');
+const { MessageEmbed } = require('discord.js');
+
+const createListString = (member) => {
+  return `${member.user.username} is ${
+    member.roles.cache.has(process.env.AVAILABLE_ROLE_ID)
+      ? '**Available**'
+      : '**Unavailable**'
+  }`;
+};
 
 module.exports = {
-  name: 'available-who',
+  slash: true,
+  testOnly: true,
+  name: 'find-role-availabilty',
   description:
-    'List all active members within a specified role along with their availability.',
-  execute(Discord, message, args) {
-    if (args.length < 3) {
-      return message.channel.send(
-        `Please specify what role you are looking to search ex. *@keeper available-who wizard*`
+    'Lists users who marked themselves as available for the required role.',
+  minArgs: 1,
+  expectedArgs: '<role-name>',
+  callback: ({ args, channel }) => {
+    try {
+      let [role] = args;
+
+      role = role.toLowerCase();
+
+      if (!(role in TAG_LOOKUP)) {
+        return new MessageEmbed().setDescription('Role not found.');
+      }
+
+      tagRole = TAG_LOOKUP[role];
+
+      const discordRoles = channel.guild.roles.cache.filter(
+        (r) => tagRole === r.name
       );
-    }
-    const printEmbeddedList = initPrinter(Discord, message);
-    const available_grep = message.content.includes('available-grep');
-    const available_full = message.content.includes('available-full');
-    const userRoleList = args.slice(2).map((role) => role.toLowerCase());
 
-    let convertedRoleNames;
+      let available;
 
-    if (available_grep) {
-      if (args.length > 3)
-        return message.channel.send(
-          'Substring search only supports one substring.'
-        );
-
-      convertedRoleNames = STR_LOOKUP.filter((str) =>
-        str.includes(args[2].toLowerCase())
-      ).map((r) => TAG_LOOKUP[r]);
-    } else {
-      if (!userRoleList.every((r) => TAG_LOOKUP[r])) {
-        return message.channel.send(
-          'One or more queries entered were not valid role queries.'
-        );
-      }
-      convertedRoleNames = userRoleList.map((r) => TAG_LOOKUP[r]);
-    }
-
-    const discordRoles = message.guild.roles.cache.filter((r) =>
-      convertedRoleNames.includes(r.name)
-    );
-
-    discordRoles.forEach((r) => {
-      const checkRoleMsg = [
-        {
-          name: "Check 'Available' Role",
-          value:
-            "It's possible that guild members haven't added the 'Available' role yet."
-        }
-      ];
-
-      if (r.members.size) {
-        const available = r.members.filter(
-          (member) =>
-            member.roles.cache.has(process.env.AVAILABLE_ROLE_ID) &&
-            !member.roles.cache.has(process.env.INACTIVE_ROLE_ID)
-        );
-        printEmbeddedList({
-          message,
-          title: `All ${r.name} Available:`,
-          fields: available.size
-            ? createFields(`Total: ${available.size}`, available.array())
-            : checkRoleMsg
-        });
-        if (available_full) {
-          const unavailable = r.members.filter(
-            (member) => !member.roles.cache.has(process.env.AVAILABLE_ROLE_ID)
+      discordRoles.forEach((r) => {
+        if (!r.members.size) {
+          return new MessageEmbed().setDescription(
+            'There are no users who have this role.'
           );
-          printEmbeddedList({
-            message,
-            title: `All ${r.name} Unavailable:`,
-            fields: unavailable.size
-              ? createFields(`Total: ${unavailable.size}`, unavailable.array())
-              : checkRoleMsg
-          });
+        } else {
+          available = r.members.filter(
+            (member) =>
+              member.roles.cache.has(process.env.AVAILABLE_ROLE_ID) &&
+              !member.roles.cache.has(process.env.INACTIVE_ROLE_ID)
+          );
         }
+      });
+
+      if (available.size) {
+        let fields = available.array().map((m) => {
+          return createListString(m);
+        });
+
+        const embed = new MessageEmbed()
+          .setTitle(`All ${tagRole} Available:`)
+          .setColor('#ff3864')
+          .addFields({ name: `Total: ${available.size}`, value: fields })
+          .setTimestamp();
+
+        return embed;
       } else {
-        message.channel.send('There are no users who have this role.');
+        const embed = new MessageEmbed()
+          .setTitle(`Check 'Available' Role`)
+          .setDescription(
+            `It's possible that guild members haven't added the 'Available' role yet.`
+          );
+
+        return embed;
       }
-    });
+    } catch (err) {
+      return new MessageEmbed()
+        .setDescription('Something went wrong!')
+        .setColor('#ff3864');
+    }
   }
 };

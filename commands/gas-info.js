@@ -1,12 +1,16 @@
+const axios = require('axios');
+const { MessageEmbed } = require('discord.js');
+
 module.exports = {
+  slash: true,
+  testOnly: true,
   name: 'gas-info',
   description: 'Returns gas price stats.',
-  execute(Discord, message, axios) {
+  callback: ({}) => {
     axios
       .get('https://ethgasstation.info/api/ethgasAPI.json')
       .then((res) => {
-        let embed = new Discord.MessageEmbed()
-          .setColor('#ff3864')
+        let embed = new MessageEmbed.setColor('#ff3864')
           .setTimestamp()
           .addFields(
             {
@@ -23,10 +27,12 @@ module.exports = {
             }
           );
 
-        message.channel.send(embed);
+        return embed;
       })
-      .catch((err) =>
-        message.channel.send(`Something went wrong. Try again later!`)
-      );
+      .catch((err) => {
+        return new MessageEmbed.setDescription(
+          'Something went wrong. Try again later!'
+        ).setColor('#ff3864');
+      });
   }
 };

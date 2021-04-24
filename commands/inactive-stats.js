@@ -1,28 +1,39 @@
+const { MessageEmbed } = require('discord.js');
+
 module.exports = {
-  name: 'inactive-stats',
-  description: 'Returns total inactive members & their usernames.',
-  execute(Discord, message) {
-    let members = [];
-    message.guild.roles.cache
-      .get(process.env.INACTIVE_ROLE_ID)
-      .members.forEach((member) => {
-        members.push(member.user.username);
-      });
+  slash: true,
+  testOnly: true,
+  name: 'inactive-role-stats',
+  description: 'Returns total users with the role inactive tagged.',
+  callback: ({ channel }) => {
+    try {
+      let members = [];
 
-    let embed = new Discord.MessageEmbed()
-      .setColor('#ff3864')
-      .setTimestamp()
-      .addFields(
-        {
-          name: 'Total Inactive',
-          value: members.length
-        },
-        {
-          name: 'Inactive Members',
-          value: members
-        }
-      );
+      channel.guild.roles.cache
+        .get(process.env.INACTIVE_ROLE_ID)
+        .members.forEach((member) => {
+          members.push(member.user.username);
+        });
 
-    message.channel.send(embed);
+      let embed = new MessageEmbed()
+        .setColor('#ff3864')
+        .setTimestamp()
+        .addFields(
+          {
+            name: 'Total Inactive',
+            value: members.length
+          },
+          {
+            name: 'Inactive Members',
+            value: members
+          }
+        );
+
+      return embed;
+    } catch (err) {
+      return new MessageEmbed()
+        .setDescription('Something went wrong!')
+        .setColor('#ff3864');
+    }
   }
 };

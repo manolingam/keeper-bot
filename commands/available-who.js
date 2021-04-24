@@ -54,6 +54,8 @@ module.exports = {
           return createListString(m);
         });
 
+        console.log(fields);
+
         const embed = new MessageEmbed()
           .setTitle(`All ${tagRole} Available:`)
           .setColor('#ff3864')
@@ -71,6 +73,7 @@ module.exports = {
         return embed;
       }
     } catch (err) {
+      console.log(err);
       return new MessageEmbed()
         .setDescription('Something went wrong!')
         .setColor('#ff3864');

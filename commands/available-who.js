@@ -17,8 +17,7 @@ module.exports = {
     'Lists users who marked themselves as available for the required role.',
   minArgs: 1,
   expectedArgs: '<role-name>',
-  callback: ({ args, channel, interaction }) => {
-    console.log(interaction);
+  callback: ({ args, channel }) => {
     try {
       let [role] = args;
 

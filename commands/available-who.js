@@ -17,7 +17,8 @@ module.exports = {
     'Lists users who marked themselves as available for the required role.',
   minArgs: 1,
   expectedArgs: '<role-name>',
-  callback: ({ args, channel }) => {
+  callback: ({ args, channel, interaction }) => {
+    console.log(interaction);
     try {
       let [role] = args;
 
@@ -54,6 +55,8 @@ module.exports = {
           return createListString(m);
         });
 
+        console.log(fields);
+
         const embed = new MessageEmbed()
           .setTitle(`All ${tagRole} Available:`)
           .setColor('#ff3864')
@@ -71,6 +74,7 @@ module.exports = {
         return embed;
       }
     } catch (err) {
+      console.log(err);
       return new MessageEmbed()
         .setDescription('Something went wrong!')
         .setColor('#ff3864');

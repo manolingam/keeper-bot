@@ -2,9 +2,9 @@ const TAG_LOOKUP = {
   apprentice: 'Apprentice (New Applicants)',
   newapplicants: 'Apprentice (New Applicants)',
 
-  archer: 'Archer (Design)',
-  design: 'Archer (Design)',
-  designer: 'Archer (Design)',
+  archer: 'Archer (Visual Design)',
+  design: 'Archer (Visual Design)',
+  designer: 'Archer (Visual Design)',
 
   druid: 'Druid (Data Science/Analyst)',
   datascientist: 'Druid (Data Science/Analyst)',
@@ -22,10 +22,10 @@ const TAG_LOOKUP = {
   necromancer: 'Necromancer (DevOps)',
   devops: 'Necromancer (DevOps)',
 
-  ranger: 'Ranger (UX/User Testing)',
-  ux: 'Ranger (UX/User Testing)',
-  usertesting: 'Ranger (UX/User Testing)',
-  qa: 'Ranger (UX/User Testing)',
+  ranger: 'Ranger (UX Design)',
+  ux: 'Ranger (UX Design)',
+  usertesting: 'Ranger (UX Design)',
+  qa: 'Ranger (UX Design)',
 
   warrior: 'Warrior (FrontEnd Dev)',
   frontend: 'Warrior (FrontEnd Dev)',

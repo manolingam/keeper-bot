@@ -1,4 +1,6 @@
 const TAG_LOOKUP = {
+  cohort: 'Cohort',
+
   apprentice: 'Apprentice (New Applicants)',
   newapplicants: 'Apprentice (New Applicants)',
 

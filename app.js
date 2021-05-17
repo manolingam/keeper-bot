@@ -2,6 +2,8 @@
 const Discord = require('discord.js');
 
 const WOKCommands = require('wokcommands');
+const { welcomeMessages } = require('./utils/helpers');
+
 const client = new Discord.Client({
   partials: ['MESSAGE', 'REACTION']
 });
@@ -21,13 +23,6 @@ client.on('ready', async () => {
 });
 
 client.on('guildMemberAdd', (member) => {
-  const randomGreetings = [
-    'Glad you are here, ',
-    'Everyone welcome ',
-    'Welcome, ',
-    'Good to see you, '
-  ];
-
   const tavern = member.guild.channels.cache.get(process.env.TAVERN_CHANNEL_ID);
   const commandCenter = member.guild.channels.cache.get(
     process.env.COMMAND_CENTER_ID
@@ -37,9 +32,7 @@ client.on('guildMemberAdd', (member) => {
     commandCenter.send(`Kicked unauthorized bot, <@${member.id}>`);
     member.kick();
   } else {
-    var greeting =
-      randomGreetings[Math.floor(Math.random() * randomGreetings.length)];
-    tavern.send(`${greeting}<@${member.id}>`);
+    tavern.send(welcomeMessages(member));
   }
 });
 

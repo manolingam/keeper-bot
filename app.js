@@ -2,7 +2,9 @@
 const Discord = require('discord.js');
 
 const WOKCommands = require('wokcommands');
+
 const { welcomeMessages } = require('./utils/helpers');
+const { roleClaim } = require('./features/role-claim');
 
 const client = new Discord.Client({
   partials: ['MESSAGE', 'REACTION']
@@ -18,6 +20,8 @@ client.on('ready', async () => {
     testServers: [process.env.GUILD_ID],
     showWarns: false
   });
+
+  roleClaim(client);
 
   require('./server');
 });

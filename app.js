@@ -5,6 +5,7 @@ const WOKCommands = require('wokcommands');
 
 const { welcomeMessages } = require('./utils/helpers');
 const { roleClaim } = require('./features/role-claim');
+const { anonymousSuggestion } = require('./features/anonymous-suggestion');
 
 const client = new Discord.Client({
   partials: ['MESSAGE', 'REACTION']
@@ -22,6 +23,7 @@ client.on('ready', async () => {
   });
 
   roleClaim(client);
+  anonymousSuggestion(client);
 
   require('./server');
 });

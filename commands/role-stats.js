@@ -3,8 +3,8 @@ const { MessageEmbed } = require('discord.js');
 module.exports = {
   slash: true,
   testOnly: true,
-  name: 'all-role-count',
-  description: 'Returns the total number of users in each role.',
+  name: 'primary-roles-count',
+  description: 'Returns the total number of users in each primary role.',
   callback: ({ channel }) => {
     try {
       let roles = [];
@@ -30,21 +30,23 @@ module.exports = {
       ];
 
       let ignoredRoles = '';
-      filterRoles.map((role) => (ignoredRoles += `__*${role}*__ `));
+      filterRoles.map((role) => {
+        if (role !== '@everyone') ignoredRoles += `__*${role}*__\t\t`;
+      });
 
       channel.guild.roles.cache.forEach((role) => {
         if (!filterRoles.includes(role.name)) {
           let count = channel.guild.roles.cache.get(role.id).members.size;
-          roles.push(`**${role.name}** - ${count}`);
+          roles.push(`${role.name} - ${count}\n`);
         }
       });
 
       let embed = new MessageEmbed()
         .setColor('#ff3864')
         .setDescription(
-          `Counted in the important roles while ignoring these.\n\n${ignoredRoles}`
+          `Counted in the primary roles while ignoring these.\n\n${ignoredRoles}`
         )
-        .addFields({ name: 'Counted roles', value: roles });
+        .addFields({ name: 'Primary roles', value: roles });
 
       return embed;
     } catch (err) {

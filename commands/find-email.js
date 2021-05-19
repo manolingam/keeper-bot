@@ -14,12 +14,21 @@ client.connect();
 module.exports = {
   slash: true,
   testOnly: true,
-  name: 'find-raider-email',
+  name: 'find-member-email',
   description: 'Finds the email address of a member with possible matches.',
   minArgs: 1,
   expectedArgs: '<member name>',
-  callback: async ({ args }) => {
+  callback: async ({ args, interaction }) => {
     try {
+      const isMember = interaction.member.roles.includes(
+        process.env.MEMBER_ROLE_ID
+      );
+
+      if (!isMember)
+        return new MessageEmbed().setDescription(
+          'Only members can use this command.'
+        );
+
       let [name] = args;
       let results = [];
 

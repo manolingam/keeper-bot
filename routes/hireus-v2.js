@@ -177,6 +177,34 @@ HIREUS_V2_ROUTER.post('/feedback', async (req, res) => {
       });
     }
   );
+
+  try {
+    let Discord = req.DISCORD;
+    let embed = new Discord.MessageEmbed()
+      .setColor('#ff3864')
+      .setTitle('New hireus feedback received')
+      .addFields(
+        {
+          name: 'Rating given.',
+          value: rating ? Number(rating) : 'Not provided.'
+        },
+        {
+          name: 'How the user heard about us?',
+          value: feedbackOne ? feedbackOne : 'Not provided.'
+        },
+        {
+          name: 'What can be better?',
+          value: feedbackTwo ? feedbackTwo : 'Not provided.'
+        }
+      );
+
+    req.CLIENT.guilds.cache
+      .get(process.env.GUILD_ID)
+      .channels.cache.get(process.env.WHISPERS_CHANNEL_ID)
+      .send(embed);
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 module.exports = HIREUS_V2_ROUTER;

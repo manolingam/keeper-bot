@@ -24,7 +24,7 @@ client.on('ready', async () => {
     showWarns: false
   });
 
-  entryCheck(client);
+  entryCheck(client, portcullis);
   roleClaim(client);
   anonymousSuggestion(client);
 

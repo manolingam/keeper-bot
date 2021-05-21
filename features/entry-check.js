@@ -1,6 +1,6 @@
 const { welcomeMessages } = require('../utils/helpers');
 
-const entryCheck = (client, portcullis) => {
+const entryCheck = (client) => {
   client.on('guildMemberAdd', (member) => {
     const tavern = member.guild.channels.cache.get(
       process.env.TAVERN_CHANNEL_ID
@@ -9,13 +9,9 @@ const entryCheck = (client, portcullis) => {
       process.env.COMMAND_CENTER_ID
     );
 
-    if (member.user.bot && portcullis) {
+    if (member.user.bot) {
       commandCenter.send(`Kicked unauthorized bot, <@${member.id}>`);
       member.kick();
-    } else if (member.user.bot && !portcullis) {
-      tavern.send(
-        `This bot is allowed to stay. Prove your worth, <@${member.id}>`
-      );
     } else {
       tavern.send(welcomeMessages(member));
     }

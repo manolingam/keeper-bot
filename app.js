@@ -3,7 +3,6 @@ const Discord = require('discord.js');
 
 const WOKCommands = require('wokcommands');
 
-const { entryCheck } = require('./features/entry-check');
 const { roleClaim } = require('./features/role-claim');
 const { anonymousSuggestion } = require('./features/anonymous-suggestion');
 
@@ -15,6 +14,24 @@ require('dotenv').config();
 
 let portcullis = true;
 
+const entryCheck = (member) => {
+  const tavern = member.guild.channels.cache.get(process.env.TAVERN_CHANNEL_ID);
+  const commandCenter = member.guild.channels.cache.get(
+    process.env.COMMAND_CENTER_ID
+  );
+
+  if (member.user.bot && portcullis) {
+    commandCenter.send(`Kicked unauthorized bot, <@${member.id}>`);
+    member.kick();
+  } else if (member.user.bot && !portcullis) {
+    tavern.send(
+      `This bot is allowed to stay. Prove your worth, <@${member.id}>`
+    );
+  } else {
+    tavern.send(welcomeMessages(member));
+  }
+};
+
 client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`);
 
@@ -24,11 +41,14 @@ client.on('ready', async () => {
     showWarns: false
   });
 
-  entryCheck(client, portcullis);
   roleClaim(client);
   anonymousSuggestion(client);
 
   require('./server');
+});
+
+client.on('guildMemberAdd', (member) => {
+  entryCheck(member);
 });
 
 // controller
@@ -40,11 +60,6 @@ client.on('message', (message) => {
       if (invocation[1] === 'portcullis' && invocation[0] === 'lift') {
         portcullis = false;
 
-        client.removeListener('guildMemberAdd', (member) =>
-          console.log(member)
-        );
-
-        entryCheck(client, portcullis);
         return message.channel.send(
           new Discord.MessageEmbed()
             .setDescription('Portcullis lifted!')
@@ -53,11 +68,6 @@ client.on('message', (message) => {
       } else if (invocation[1] === 'portcullis' && invocation[0] === 'lower') {
         portcullis = true;
 
-        client.removeListener('guildMemberAdd', (member) =>
-          console.log(member)
-        );
-
-        entryCheck(client, portcullis);
         return message.channel.send(
           new Discord.MessageEmbed()
             .setDescription('Portcullis lowered!')

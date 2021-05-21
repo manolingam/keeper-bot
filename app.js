@@ -33,27 +33,33 @@ client.on('ready', async () => {
 
 // controller
 
-// client.on('message', (message) => {
-//   if (message.member.id === process.env.OWNER_ID) {
-//     let invocation = message.content.split(' ');
-//     if (invocation[1] === 'portcullis' && invocation[0] === 'lift') {
-//       portcullis = false;
-//       entryCheck(client, portcullis);
-//       return message.channel.send(
-//         new Discord.MessageEmbed()
-//           .setDescription('Portcullis lifted!')
-//           .setColor('#ff3864')
-//       );
-//     } else if (invocation[1] === 'portcullis' && invocation[0] === 'lower') {
-//       portcullis = true;
-//       entryCheck(client, portcullis);
-//       return message.channel.send(
-//         new Discord.MessageEmbed()
-//           .setDescription('Portcullis lowered!')
-//           .setColor('#ff3864')
-//       );
-//     }
-//   }
-// });
+client.on('message', (message) => {
+  if (message.member.id === process.env.OWNER_ID) {
+    let invocation = message.content.split(' ');
+    if (invocation[1] === 'portcullis' && invocation[0] === 'lift') {
+      portcullis = false;
+
+      client.removeListener('guildMemberAdd', (member) => console.log(member));
+
+      entryCheck(client, portcullis);
+      return message.channel.send(
+        new Discord.MessageEmbed()
+          .setDescription('Portcullis lifted!')
+          .setColor('#ff3864')
+      );
+    } else if (invocation[1] === 'portcullis' && invocation[0] === 'lower') {
+      portcullis = true;
+
+      client.removeListener('guildMemberAdd', (member) => console.log(member));
+
+      entryCheck(client, portcullis);
+      return message.channel.send(
+        new Discord.MessageEmbed()
+          .setDescription('Portcullis lowered!')
+          .setColor('#ff3864')
+      );
+    }
+  }
+});
 
 client.login(process.env.TOKEN);

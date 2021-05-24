@@ -88,4 +88,30 @@ ESCROW_ROUTER.post('/update-raid', async (req, res) => {
   );
 });
 
+ESCROW_ROUTER.post('/update-invoice', async (req, res) => {
+  let { ID, Hash, Index } = req.body;
+
+  await req.RAID_CENTRAL_V2_BASE('Raids v2').update(
+    [
+      {
+        id: ID,
+        fields: {
+          'Locker Hash': Hash,
+          'Invoice ID': Index
+        }
+      }
+    ],
+    function (err, records) {
+      if (err) {
+        console.error(err);
+        res.json('ERROR');
+        return;
+      }
+      records.forEach(function (record) {
+        res.json('SUCCESS');
+      });
+    }
+  );
+});
+
 module.exports = ESCROW_ROUTER;

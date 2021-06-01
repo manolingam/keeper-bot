@@ -15,8 +15,17 @@ module.exports = {
   description: 'Adds info about a direct fund transfer to the guild.',
   minArgs: 2,
   expectedArgs: '<brief> <tx-link>',
-  callback: ({ args }) => {
+  callback: ({ args, interaction }) => {
     try {
+      const isMember = interaction.member.roles.includes(
+        process.env.MEMBER_ROLE_ID
+      );
+
+      if (!isMember)
+        return new MessageEmbed().setDescription(
+          'Only members can use this command.'
+        );
+
       const [brief, tx] = args;
 
       treasury_base('Direct Transfers').create(

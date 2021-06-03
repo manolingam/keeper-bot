@@ -83,6 +83,8 @@ const entryCheck = (member) => {
             message.react('👍');
             message.react('👎');
           });
+      } else {
+        tavern.send(welcomeMessages(member));
       }
     } else {
       tavern.send(welcomeMessages(member));

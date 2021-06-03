@@ -1,73 +1,74 @@
-const { initPrinter } = require('../utils/print-helpers');
+const { MessageEmbed } = require('discord.js');
 
 module.exports = {
-  name: 'available',
-  description: "Changes a member's availability",
-  execute(Discord, message, args) {
-    if (args.length < 3) {
-      return message.channel.send(
-        new Discord.MessageEmbed()
-          .setColor('#ff3864')
-          .setDescription(
-            'Please specify whether or not you are available by adding **true** or **false** after ``@keeper available``'
-          )
-      );
-    }
-    //It checks for string 'true' and 'false' before parse.
-    //JSON parse will crash if it recieves a value it doesn't recognize
-    if (args[2].toLowerCase() !== 'true' && args[2].toLowerCase() !== 'false') {
-      return message.channel.send(
-        new Discord.MessageEmbed()
-          .setColor('#ff3864')
-          .setDescription(
-            'This command only takes **true** or **false** as sub-commands after ``@keeper available``'
-          )
-      );
-    }
+  slash: true,
+  testOnly: true,
+  name: 'update-my-availability',
+  description: 'Update your availability with either true or false',
+  minArgs: 1,
+  expectedArgs: '<boolean>',
+  callback: ({ args, interaction, channel }) => {
+    try {
+      let [status] = args;
 
-    const isAvailable = message.member.roles.cache.has(
-      process.env.AVAILABLE_ROLE_ID
-    );
-    const printEmbed = initPrinter(Discord, message);
-    const boolArg = JSON.parse(args[2].toLowerCase());
-
-    if (isAvailable && boolArg) {
-      return message.channel.send(`You're already available for raids`);
-    } else if (isAvailable && !boolArg) {
-      message.member.roles
-        .remove(process.env.AVAILABLE_ROLE_ID)
-        .then(() => {
-          printEmbed({
-            title: `${message.author.username} is now unavailable for raids.`
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-          return message.channel.send(`Something went wrong.`);
-        });
-    } else if (!isAvailable && boolArg) {
-      const isInactive = message.member.roles.cache.has(
-        process.env.INACTIVE_ROLE_ID
-      );
-      if (isInactive) {
-        message.channel.send(
-          "Inactive users cannot be available for raids. Please remove 'inactive' role first."
-        );
-      } else {
-        message.member.roles
-          .add(process.env.AVAILABLE_ROLE_ID)
-          .then(() => {
-            printEmbed({
-              title: `${message.author.username} is now available for raids.`
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-            return message.channel.send(`Something went wrong.`);
-          });
+      if (status.toLowerCase() !== 'true' && status.toLowerCase() !== 'false') {
+        return new MessageEmbed()
+          .setColor('#ff3864')
+          .setDescription('This command only takes **true** or **false**');
       }
-    } else {
-      return message.channel.send(`You were already unavailable.`);
+
+      const isAvailable = interaction.member.roles.includes(
+        process.env.AVAILABLE_ROLE_ID
+      );
+
+      const boolArg = JSON.parse(status.toLowerCase());
+
+      if (isAvailable && boolArg) {
+        return new MessageEmbed()
+          .setColor('#ff3864')
+          .setDescription(`You're already available for raids`);
+      } else if (isAvailable && !boolArg) {
+        const member = channel.guild.members.cache.get(
+          interaction.member.user.id
+        );
+        member.roles.remove(process.env.AVAILABLE_ROLE_ID);
+        return new MessageEmbed()
+          .setColor('#ff3864')
+          .setDescription(
+            `${interaction.member.user.username} is now unavailable for raids.`
+          );
+      } else if (!isAvailable && boolArg) {
+        const isInactive = interaction.member.roles.includes(
+          process.env.INACTIVE_ROLE_ID
+        );
+
+        if (isInactive) {
+          return new MessageEmbed()
+            .setColor('#ff3864')
+            .setDescription(
+              `Inactive users cannot be made available for raids. Please remove 'inactive' role first.`
+            );
+        } else {
+          const member = channel.guild.members.cache.get(
+            interaction.member.user.id
+          );
+          member.roles.add(process.env.AVAILABLE_ROLE_ID);
+          return new MessageEmbed()
+            .setColor('#ff3864')
+            .setDescription(
+              `${interaction.member.user.username} is now available for raids.`
+            );
+        }
+      } else {
+        return new MessageEmbed()
+          .setColor('#ff3864')
+          .setDescription(`You are already unavailable.`);
+      }
+    } catch (err) {
+      let embed = new MessageEmbed()
+        .setColor('#ff3864')
+        .setDescription('Invalid Argument.');
+      return embed;
     }
   }
 };

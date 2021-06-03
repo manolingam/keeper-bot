@@ -1,28 +1,29 @@
-module.exports = {
-  name: 'available-status',
-  description: 'Allows a member to see their current availability',
-  execute(Discord, message) {
-    const isAvailable = message.member.roles.cache.has(
-      process.env.AVAILABLE_ROLE_ID
-    );
-    const embed = new Discord.MessageEmbed()
-      .setColor('#ff3864')
-      .setTimestamp()
-      .setTitle(
-        isAvailable
-          ? 'You are available for raids.'
-          : 'You are not available for raids.'
-      )
-      .addFields({
-        name: 'Want to change your availability?',
-        value: `Copy & Paste this command:
-         ${
-           isAvailable
-             ? '``@keeper available false``'
-             : '``@keeper available true``'
-         }`
-      });
+const { MessageEmbed } = require('discord.js');
 
-    message.channel.send(embed);
+module.exports = {
+  slash: true,
+  testOnly: true,
+  name: 'my-availabilty-status',
+  description: 'Allows a member to see their current availability.',
+  callback: ({ interaction }) => {
+    try {
+      const isAvailable = interaction.member.roles.includes(
+        process.env.AVAILABLE_ROLE_ID
+      );
+
+      const embed = new MessageEmbed()
+        .setColor('#ff3864')
+        .setTitle(
+          isAvailable
+            ? 'You are available for raids.'
+            : 'You are not available for raids.'
+        );
+
+      return embed;
+    } catch (err) {
+      return new MessageEmbed()
+        .setDescription('Something went wrong!')
+        .setColor('#ff3864');
+    }
   }
 };

@@ -32,6 +32,8 @@ const handleReaction = (reaction, user) => {
     let swammerId;
 
     reaction.message.fetch().then((msg) => {
+      if (msg.author.id !== process.env.BOT_ID) return;
+
       if (msg.mentions.roles.first() !== undefined) {
         swammerId = msg.mentions.roles.first().id;
       } else if (msg.mentions.users.first() !== undefined) {

@@ -15,7 +15,7 @@ require('dotenv').config();
 
 let portcullis = true;
 
-const handleReaction = (reaction, user) => {
+const handleReaction = async (reaction, user) => {
   try {
     if (user.id === process.env.BOT_ID) {
       return;
@@ -31,26 +31,28 @@ const handleReaction = (reaction, user) => {
 
     let swammerId;
 
-    reaction.message.fetch().then((msg) => {
-      if (msg.author.id !== process.env.BOT_ID) return;
+    let msg = await reaction.message.fetch();
 
-      if (msg.mentions.roles.first() !== undefined) {
-        swammerId = msg.mentions.roles.first().id;
-      } else if (msg.mentions.users.first() !== undefined) {
-        swammerId = msg.mentions.users.first().id;
-      }
+    if (msg.author.id !== process.env.BOT_ID) return;
 
-      guild.members.fetch(swammerId).then((member) => {
-        if (emoji === '👍') {
-          reaction.message.delete();
-          tavern.send(welcomeMessages(member));
-        } else if (emoji === '👎') {
-          member.kick();
-          reaction.message.delete();
-          commandCenter.send(`${user.username} kicked <@${member.id}>`);
-        }
-      });
-    });
+    if (msg.mentions.roles.first() !== undefined) {
+      swammerId = msg.mentions.roles.first().id;
+    } else if (msg.mentions.users.first() !== undefined) {
+      swammerId = msg.mentions.users.first().id;
+    }
+
+    let swammerMember = await guild.members.fetch(swammerId);
+
+    if (emoji === '👍') {
+      tavern.send(welcomeMessages(swammerMember));
+    } else if (emoji === '👎') {
+      commandCenter.send(`${user.username} kicked <@${swammerMember.id}>`);
+      swammerMember.kick();
+    }
+
+    if (emoji === '👍' || emoji === '👎') {
+      reaction.message.delete();
+    }
   } catch (err) {
     console.log(err);
   }

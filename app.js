@@ -75,7 +75,7 @@ const entryCheck = (member) => {
       tavern.send(
         `This bot is allowed to stay. Prove your worth, <@${member.id}>`
       );
-    } else if (flags in member.user) {
+    } else if (member.user.flags) {
       if (member.user.flags.bitfield === 0) {
         swarmCouncil
           .send(`Potential swammer, <@${member.id}>, react to decide!`)

@@ -15,21 +15,78 @@ require('dotenv').config();
 
 let portcullis = true;
 
-const entryCheck = (member) => {
-  const tavern = member.guild.channels.cache.get(process.env.TAVERN_CHANNEL_ID);
-  const commandCenter = member.guild.channels.cache.get(
-    process.env.COMMAND_CENTER_ID
-  );
+const handleReaction = (reaction, user) => {
+  try {
+    if (user.id === process.env.BOT_ID) {
+      return;
+    }
 
-  if (member.user.bot && portcullis) {
-    commandCenter.send(`Kicked unauthorized bot, <@${member.id}>`);
-    member.kick();
-  } else if (member.user.bot && !portcullis) {
-    tavern.send(
-      `This bot is allowed to stay. Prove your worth, <@${member.id}>`
+    const emoji = reaction._emoji.name;
+    const { guild } = reaction.message;
+
+    const tavern = guild.channels.cache.get(process.env.TAVERN_CHANNEL_ID);
+    const commandCenter = guild.channels.cache.get(
+      process.env.COMMAND_CENTER_ID
     );
-  } else {
-    tavern.send(welcomeMessages(member));
+
+    let swammerId;
+
+    reaction.message.fetch().then((msg) => {
+      if (msg.mentions.roles.first() !== undefined) {
+        swammerId = msg.mentions.roles.first().id;
+      } else if (msg.mentions.users.first() !== undefined) {
+        swammerId = msg.mentions.users.first().id;
+      }
+
+      guild.members.fetch(swammerId).then((member) => {
+        if (emoji === '👍') {
+          reaction.message.delete();
+          tavern.send(welcomeMessages(member));
+        } else if (emoji === '👎') {
+          member.kick();
+          reaction.message.delete();
+          commandCenter.send(`${user.username} kicked <@${member.id}>`);
+        }
+      });
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const entryCheck = (member) => {
+  try {
+    const tavern = member.guild.channels.cache.get(
+      process.env.TAVERN_CHANNEL_ID
+    );
+    const swarmCouncil = member.guild.channels.cache.get(
+      process.env.SWARM_COUNCIL_CHANNEL_ID
+    );
+    const commandCenter = member.guild.channels.cache.get(
+      process.env.COMMAND_CENTER_ID
+    );
+
+    if (member.user.bot && portcullis) {
+      commandCenter.send(`Kicked unauthorized bot, <@${member.id}>`);
+      member.kick();
+    } else if (member.user.bot && !portcullis) {
+      tavern.send(
+        `This bot is allowed to stay. Prove your worth, <@${member.id}>`
+      );
+    } else if (flags in member.user) {
+      if (member.user.flags.bitfield === 0) {
+        swarmCouncil
+          .send(`Potential swammer, <@${member.id}>, react to decide!`)
+          .then((message) => {
+            message.react('👍');
+            message.react('👎');
+          });
+      }
+    } else {
+      tavern.send(welcomeMessages(member));
+    }
+  } catch (err) {
+    console.log(err);
   }
 };
 
@@ -52,7 +109,11 @@ client.on('guildMemberAdd', (member) => {
   entryCheck(member);
 });
 
-// controller
+client.on('messageReactionAdd', (reaction, user) => {
+  if (reaction.message.channel.id === process.env.SWARM_COUNCIL_CHANNEL_ID) {
+    handleReaction(reaction, user);
+  }
+});
 
 client.on('message', (message) => {
   try {

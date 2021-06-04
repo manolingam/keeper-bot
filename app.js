@@ -16,19 +16,18 @@ require('dotenv').config();
 let portcullis = true;
 
 const handleReaction = async (reaction, user) => {
+  if (user.id === process.env.BOT_ID) {
+    return;
+  }
+
+  const { guild } = reaction.message;
+
+  const tavern = guild.channels.cache.get(process.env.TAVERN_CHANNEL_ID);
+  const commandCenter = guild.channels.cache.get(process.env.COMMAND_CENTER_ID);
+
+  const emoji = reaction._emoji.name;
+
   try {
-    if (user.id === process.env.BOT_ID) {
-      return;
-    }
-
-    const emoji = reaction._emoji.name;
-    const { guild } = reaction.message;
-
-    const tavern = guild.channels.cache.get(process.env.TAVERN_CHANNEL_ID);
-    const commandCenter = guild.channels.cache.get(
-      process.env.COMMAND_CENTER_ID
-    );
-
     let swammerId;
 
     let msg = await reaction.message.fetch();
@@ -55,6 +54,14 @@ const handleReaction = async (reaction, user) => {
     }
   } catch (err) {
     console.log(err);
+    if (err.message === 'Unknown Member') {
+      commandCenter.send(
+        `This user in this message has left the server already - _${reaction.message.content}_`
+      );
+    }
+    if (emoji === '👍' || emoji === '👎') {
+      reaction.message.delete();
+    }
   }
 };
 

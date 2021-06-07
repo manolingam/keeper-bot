@@ -13,6 +13,10 @@ const anonymousSuggestion = (client) => {
     ];
 
     client.on('message', (message) => {
+      let invocation = message.content.split(' ');
+
+      if (invocation[0] !== 'whisper') return;
+
       if (message.channel.type === 'dm') {
         let embed = new MessageEmbed()
           .setColor('#ff3864')

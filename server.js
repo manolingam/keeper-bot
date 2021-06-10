@@ -63,6 +63,7 @@ app.use(
   '/escrow',
   (req, res, next) => {
     req.DISCORD = Discord;
+    req.CLIENT = client;
     req.RAID_CENTRAL_V2_BASE = raid_central_v2_base;
     next();
   },

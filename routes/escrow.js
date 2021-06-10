@@ -115,18 +115,15 @@ ESCROW_ROUTER.post('/update-invoice', async (req, res) => {
 });
 
 ESCROW_ROUTER.post('/notify-spoils', async (req, res) => {
-  let { token, raidPartyShare, guildShare, wrappedInvoice } = req.body;
+  let { token, raidPartyShare, guildShare, txLink } = req.body;
 
   try {
     let Discord = req.DISCORD;
     let embed = new Discord.MessageEmbed()
       .setColor('#ff3864')
       .setTitle('Spoils Alert')
+      .setURL(txLink)
       .addFields(
-        {
-          name: 'Wrapped Invoice',
-          value: wrappedInvoice
-        },
         {
           name: 'Guild Spoils',
           value: `${guildShare} ${token}`

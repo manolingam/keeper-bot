@@ -5,7 +5,7 @@ const WOKCommands = require('wokcommands');
 
 const { roleClaim } = require('./features/role-claim');
 const { anonymousSuggestion } = require('./features/anonymous-suggestion');
-const { welcomeMessages } = require('./utils/helpers.js');
+const { entryCheck } = require('./features/portcullis-captcha');
 
 const client = new Discord.Client({
   partials: ['MESSAGE', 'REACTION']
@@ -14,24 +14,6 @@ const client = new Discord.Client({
 require('dotenv').config();
 
 let portcullis = true;
-
-const entryCheck = (member) => {
-  const tavern = member.guild.channels.cache.get(process.env.TAVERN_CHANNEL_ID);
-  const commandCenter = member.guild.channels.cache.get(
-    process.env.COMMAND_CENTER_ID
-  );
-
-  if (member.user.bot && portcullis) {
-    commandCenter.send(`Kicked unauthorized bot, <@${member.id}>`);
-    member.kick();
-  } else if (member.user.bot && !portcullis) {
-    tavern.send(
-      `This bot is allowed to stay. Prove your worth, <@${member.id}>`
-    );
-  } else {
-    tavern.send(welcomeMessages(member));
-  }
-};
 
 client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -49,12 +31,11 @@ client.on('ready', async () => {
 });
 
 client.on('guildMemberAdd', (member) => {
-  entryCheck(member);
+  entryCheck(member, portcullis);
 });
 
-// controller
-
 client.on('message', (message) => {
+  if (!message.member) return;
   try {
     if (message.member.id === process.env.OWNER_ID) {
       let invocation = message.content.split(' ');

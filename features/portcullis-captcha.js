@@ -70,9 +70,9 @@ const entryCheck = async (member, portcullis) => {
               'Sorry, no valid response received within the time. Try joining the server again if you missed it.'
             )
           );
-          commandCenter.send(
-            `Kicked <@${member.id}> due to portcullis verification fail.`
-          );
+          // commandCenter.send(
+          //   `Kicked <@${member.id}> due to portcullis verification fail.`
+          // );
           member.kick();
         }
       }

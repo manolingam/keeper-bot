@@ -3,7 +3,7 @@ const { MessageEmbed } = require('discord.js');
 module.exports = {
   slash: true,
   testOnly: true,
-  name: 'valhalla-this',
+  name: 'to-valhalla',
   description: 'Sends a channel to Valhalla.',
   minArgs: 1,
   expectedArgs: '<channel>',
@@ -23,10 +23,10 @@ module.exports = {
 
       let _channel = channel.guild.channels.cache.get(channelId);
       let category = channel.guild.channels.cache.find(
-        (c) => c.name == 'Valhalla 1/21' && c.type == 'category'
+        (c) => c.name == 'Valhalla 6/21' && c.type == 'category'
       );
 
-      if (_channel.parentID == process.env.VALHALLA_1_21_CHANNEL_ID) {
+      if (_channel.parentID == process.env.VALHALLA_6_21_CHANNEL_ID) {
         let embed = new MessageEmbed()
           .setColor('#ff3864')
           .setDescription('This is already in Valhalla!');
@@ -38,7 +38,7 @@ module.exports = {
 
       let embed = new MessageEmbed()
         .setColor('#ff3864')
-        .setDescription('Sent to Valhalla 1/21.');
+        .setDescription('Sent to Valhalla 6/21.');
 
       return embed;
     } catch (err) {

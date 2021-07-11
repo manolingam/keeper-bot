@@ -1,6 +1,28 @@
 const express = require('express');
+const { Client } = require('pg');
+
+const client = new Client({
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DB,
+  password: process.env.PG_SECRET,
+  port: 5432
+});
+
+client.connect();
 
 const HIREUS_V2_ROUTER = express.Router();
+
+HIREUS_V2_ROUTER.get('/awaiting-raids', async (req, res) => {
+  try {
+    let { rows } = await client.query(
+      `select * from raids_v2 where raid_status='Awaiting'`
+    );
+    return res.json(rows);
+  } catch (err) {
+    return res.json(err);
+  }
+});
 
 HIREUS_V2_ROUTER.post('/consultation', async (req, res) => {
   let {

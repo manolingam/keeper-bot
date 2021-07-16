@@ -88,4 +88,62 @@ ESCROW_ROUTER.post('/update-raid', async (req, res) => {
   );
 });
 
+ESCROW_ROUTER.post('/update-invoice', async (req, res) => {
+  let { ID, Hash, Index } = req.body;
+
+  await req.RAID_CENTRAL_V2_BASE('Raids v2').update(
+    [
+      {
+        id: ID,
+        fields: {
+          'Locker Hash': Hash,
+          'Invoice ID': Index
+        }
+      }
+    ],
+    function (err, records) {
+      if (err) {
+        console.error(err);
+        res.json('ERROR');
+        return;
+      }
+      records.forEach(function (record) {
+        res.json('SUCCESS');
+      });
+    }
+  );
+});
+
+ESCROW_ROUTER.post('/notify-spoils', async (req, res) => {
+  let { token, raidPartyShare, guildShare, txLink } = req.body;
+
+  try {
+    let Discord = req.DISCORD;
+    let embed = new Discord.MessageEmbed()
+      .setColor('#ff3864')
+      .setTitle('Spoils Alert')
+      .setURL(txLink)
+      .addFields(
+        {
+          name: 'Guild Spoils',
+          value: `${guildShare} ${token}`
+        },
+        {
+          name: 'Raid Party Share',
+          value: `${raidPartyShare} ${token}`
+        }
+      );
+
+    req.CLIENT.guilds.cache
+      .get(process.env.GUILD_ID)
+      .channels.cache.get(process.env.SMART_ESCROW_CHANNEL_ID)
+      .send(embed);
+
+    res.json('SUCCESS');
+  } catch (err) {
+    console.log(err);
+    res.json('ERROR');
+  }
+});
+
 module.exports = ESCROW_ROUTER;

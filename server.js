@@ -1,13 +1,11 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const Airtable = require('airtable');
-const mongoose = require('mongoose');
 const express = require('express');
 const cors = require('cors');
 
 const PAYLOAD_ROUTER = require('./routes/payload');
 const DAOSHOP_ROUTER = require('./routes/daoshop');
-const HIREUS_ROUTER = require('./routes/hireus');
 const HIREUS_V2_ROUTER = require('./routes/hireus-v2');
 const TWITTER_ROUTER = require('./routes/twitter');
 const ESCROW_ROUTER = require('./routes/escrow');
@@ -18,7 +16,6 @@ Airtable.configure({
 });
 
 let daoshop_base = Airtable.base(process.env.DAOSHOP_BASE_ID);
-// let duplicate_raids = Airtable.base(process.env.DUPLICATE_RAIDS_BASE_ID);
 let raid_central_v2_base = Airtable.base(process.env.RAID_CENTRAL_V2_BASE_ID);
 
 const app = express();
@@ -49,20 +46,6 @@ app.use(
   DAOSHOP_ROUTER
 );
 app.use(
-  '/hireus',
-  (req, res, next) => {
-    req.DISCORD = Discord;
-    req.CLIENT = client;
-    req.RAID_CENTRAL_V2_BASE = raid_central_v2_base;
-    if (req.body.key === process.env.ROUTE_ACCESS_KEY) {
-      next();
-    } else {
-      return res.send('Unauthorized access!');
-    }
-  },
-  HIREUS_ROUTER
-);
-app.use(
   '/hireus-v2',
   (req, res, next) => {
     req.DISCORD = Discord;
@@ -79,6 +62,8 @@ app.use(
 app.use(
   '/escrow',
   (req, res, next) => {
+    req.DISCORD = Discord;
+    req.CLIENT = client;
     req.RAID_CENTRAL_V2_BASE = raid_central_v2_base;
     next();
   },
@@ -99,11 +84,3 @@ app.get('/', (req, res) => {
 client.login(process.env.TOKEN);
 
 app.listen(process.env.PORT || 5000, () => console.log('Listening..'));
-
-mongoose.connect(
-  process.env.MONGODB_CONNECTION,
-  { useNewUrlParser: true, useUnifiedTopology: true },
-  () => {
-    console.log('Connected to database..');
-  }
-);

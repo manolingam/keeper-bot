@@ -16,7 +16,7 @@ const HIREUS_V2_ROUTER = express.Router();
 HIREUS_V2_ROUTER.post('/awaiting-raids', async (req, res) => {
   try {
     let { rows } = await client.query(
-      `select * from raids_v2 where raid_status='Awaiting'`
+      `SELECT * FROM raids_v2 WHERE raid_status IS NULL`
     );
     return res.json(rows);
   } catch (err) {

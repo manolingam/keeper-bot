@@ -114,4 +114,36 @@ ESCROW_ROUTER.post('/update-invoice', async (req, res) => {
   );
 });
 
+ESCROW_ROUTER.post('/notify-spoils', async (req, res) => {
+  let { token, raidPartyShare, guildShare, txLink } = req.body;
+
+  try {
+    let Discord = req.DISCORD;
+    let embed = new Discord.MessageEmbed()
+      .setColor('#ff3864')
+      .setTitle('Spoils Alert')
+      .setURL(txLink)
+      .addFields(
+        {
+          name: 'Guild Spoils',
+          value: `${guildShare} ${token}`
+        },
+        {
+          name: 'Raid Party Share',
+          value: `${raidPartyShare} ${token}`
+        }
+      );
+
+    req.CLIENT.guilds.cache
+      .get(process.env.GUILD_ID)
+      .channels.cache.get(process.env.SMART_ESCROW_CHANNEL_ID)
+      .send(embed);
+
+    res.json('SUCCESS');
+  } catch (err) {
+    console.log(err);
+    res.json('ERROR');
+  }
+});
+
 module.exports = ESCROW_ROUTER;

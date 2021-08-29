@@ -24,7 +24,7 @@ module.exports = {
     // console.log(cmds);
     // await client.guilds.cache
     //   .get(process.env.GUILD_ID)
-    //   .commands.cache.get('881399095338614804')
+    //   .commands.cache.get('881470766019919872')
     //   .delete();
 
     await client.guilds.cache
@@ -32,7 +32,7 @@ module.exports = {
       ?.commands.permissions.set({
         fullPermissions: [
           {
-            id: '881470766019919876',
+            id: '881590070791008280',
             permissions: [
               {
                 id: process.env.MEMBER_ROLE_ID,
@@ -42,7 +42,7 @@ module.exports = {
             ]
           },
           {
-            id: '881470766019919875',
+            id: '881590070791008279',
             permissions: [
               {
                 id: process.env.MEMBER_ROLE_ID,
@@ -52,7 +52,7 @@ module.exports = {
             ]
           },
           {
-            id: '881470766019919872',
+            id: '881590070791008276',
             permissions: [
               {
                 id: process.env.MEMBER_ROLE_ID,
@@ -66,6 +66,6 @@ module.exports = {
 
     roleClaim(client);
 
-    createServer(client);
+    createServer();
   }
 };

@@ -1,3 +1,4 @@
+const { Client, Intents } = require('discord.js');
 const express = require('express');
 const cors = require('cors');
 
@@ -5,7 +6,18 @@ const PAYLOAD_ROUTER = require('./routes/payload');
 const HIREUS_V2_ROUTER = require('./routes/hireus-v2');
 const ESCROW_ROUTER = require('./routes/escrow');
 
-const createServer = (client) => {
+const createServer = () => {
+  const client = new Client({
+    partials: ['MESSAGE', 'REACTION', 'CHANNEL'],
+    intents: [
+      Intents.FLAGS.GUILDS,
+      Intents.FLAGS.GUILD_MESSAGES,
+      Intents.FLAGS.GUILD_MEMBERS,
+      Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+      Intents.FLAGS.DIRECT_MESSAGES
+    ]
+  });
+
   const app = express();
 
   app.use(express.json());

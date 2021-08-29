@@ -35,7 +35,7 @@ module.exports = {
             id: '881399095338614804',
             permissions: [
               {
-                id: process.env.RAIDGUILD_MEMBER_ID,
+                id: process.env.MEMBER_ROLE_ID,
                 type: 'ROLE',
                 permission: true
               }
@@ -45,7 +45,7 @@ module.exports = {
             id: '881405211506245715',
             permissions: [
               {
-                id: process.env.RAIDGUILD_MEMBER_ID,
+                id: process.env.MEMBER_ROLE_ID,
                 type: 'ROLE',
                 permission: true
               }
@@ -55,7 +55,7 @@ module.exports = {
             id: '881405211506245712',
             permissions: [
               {
-                id: process.env.RAIDGUILD_MEMBER_ID,
+                id: process.env.MEMBER_ROLE_ID,
                 type: 'ROLE',
                 permission: true
               }

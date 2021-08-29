@@ -7,13 +7,16 @@ const captchaResponse = async (member, message) => {
     const msg = await member.send({ embeds: [message] });
     const filter = (collected) => collected.author.id === member.id;
     const collected = await msg.channel
-      .awaitMessages(filter, {
+      .awaitMessages({
+        filter,
         max: 1,
         time: 60000
       })
       .catch(() => {
         console.log('Time out');
       });
+
+    console.log(collected);
 
     const reply = collected.first() ? collected.first().content : null;
     return reply;

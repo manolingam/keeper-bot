@@ -16,8 +16,6 @@ const captchaResponse = async (member, message) => {
         console.log('Time out');
       });
 
-    console.log(collected);
-
     const reply = collected.first() ? collected.first().content : null;
     return reply;
   } catch (err) {

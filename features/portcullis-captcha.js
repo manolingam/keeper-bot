@@ -23,7 +23,7 @@ const captchaResponse = async (member, message) => {
   }
 };
 
-const entryCheck = async (member, portcullis) => {
+const entryCheck = async (member) => {
   try {
     const tavern = member.guild.channels.cache.get(
       process.env.TAVERN_CHANNEL_ID
@@ -32,15 +32,11 @@ const entryCheck = async (member, portcullis) => {
       process.env.COMMAND_CENTER_ID
     );
 
-    if (member.user.bot && portcullis) {
+    if (member.user.bot) {
       commandCenter.send({
         content: `Kicked unauthorized bot, <@${member.id}>`
       });
       member.kick();
-    } else if (member.user.bot && !portcullis) {
-      tavern.send({
-        content: `This bot is allowed to stay. Prove your worth, <@${member.id}>`
-      });
     } else {
       const captcha = randomWords({ exactly: 1, wordsPerString: 5 });
 

@@ -2,6 +2,7 @@ const dotenv = require('dotenv');
 
 const createServer = require('../server');
 const roleClaim = require('../features/role-claim');
+const molochRoleClaim = require('../temp/verify');
 
 dotenv.config();
 
@@ -65,6 +66,7 @@ module.exports = {
       });
 
     roleClaim(client);
+    molochRoleClaim(client);
 
     createServer();
   }

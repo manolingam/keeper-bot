@@ -1,21 +1,21 @@
 const express = require('express');
-const { Client } = require('pg');
+const Discord = require('discord.js');
+const dotenv = require('dotenv');
 
-const client = new Client({
-  user: process.env.PG_USER,
-  host: process.env.PG_HOST,
-  database: process.env.PG_DB,
-  password: process.env.PG_SECRET,
-  port: 5432
-});
+const { initPgClient, initAirtableClient } = require('../config');
 
+dotenv.config();
+
+const client = initPgClient();
 client.connect();
+
+const raids_v2_table = initAirtableClient();
 
 const HIREUS_V2_ROUTER = express.Router();
 
 HIREUS_V2_ROUTER.post('/awaiting-raids', async (req, res) => {
   try {
-    let { rows } = await client.query(
+    const { rows } = await client.query(
       `SELECT * FROM raids_v2 WHERE raid_status IS NULL`
     );
     return res.json(rows);
@@ -25,26 +25,7 @@ HIREUS_V2_ROUTER.post('/awaiting-raids', async (req, res) => {
 });
 
 HIREUS_V2_ROUTER.post('/consultation', async (req, res) => {
-  let {
-    name,
-    email,
-    bio,
-    telegramHandle,
-    discordHandle,
-    twitterHandle,
-    contactType,
-    projectType,
-    projectSpecs,
-    specsLink,
-    projectName,
-    projectDescription,
-    servicesRequired,
-    selectedDay,
-    budgetRange,
-    specificInfo,
-    priority,
-    transaction_hash
-  } = req.body;
+  let { selectedDay } = req.body;
 
   if (selectedDay === '') {
     selectedDay = new Date().toLocaleDateString();
@@ -52,103 +33,94 @@ HIREUS_V2_ROUTER.post('/consultation', async (req, res) => {
     selectedDay = new Date(selectedDay).toLocaleDateString();
   }
 
-  await req.RAID_CENTRAL_V2_BASE('Raids v2').create(
-    [
-      {
-        fields: {
-          Name: name,
-          Email: email,
-          Bio: bio,
-          'Telegram Handle': telegramHandle,
-          'Discord Handle': discordHandle,
-          'Twitter Handle': twitterHandle,
-          'Preferred Contact Method': contactType,
-          'Project Type': projectType,
-          'Project Specs': projectSpecs,
-          'Specs Link': specsLink,
-          'Project Name': projectName,
-          'Project Description': projectDescription,
-          'Services Required': servicesRequired,
-          'Expected Deadline': selectedDay,
-          'Budget Range': budgetRange,
-          'Additional Information': specificInfo,
-          Priorities: priority,
-          'Consultation Hash': transaction_hash
-        }
-      }
-    ],
-    function (err, records) {
-      if (err) {
-        console.error(err);
-        return res.json('ERROR');
-      }
-      records.forEach(function (record) {
-        let id = record.getId();
-        return res.json(id);
-      });
-    }
-  );
+  const data = {
+    Name: req.body.name,
+    Email: req.body.email,
+    Bio: req.body.bio,
+    'Telegram Handle': req.body.telegramHandle,
+    'Discord Handle': req.body.discordHandle,
+    'Twitter Handle': req.body.twitterHandle,
+    'Preferred Contact Method': req.body.contactType,
+    'Project Type': req.body.projectType,
+    'Project Specs': req.body.projectSpecs,
+    'Specs Link': req.body.specsLink,
+    'Project Name': req.body.projectName,
+    'Project Description': req.body.projectDescription,
+    'Services Required': req.body.servicesRequired,
+    'Expected Deadline': selectedDay,
+    'Budget Range': req.body.budgetRange,
+    'Additional Information': req.body.specificInfo,
+    Priorities: req.body.priority,
+    'Consultation Hash': req.body.transaction_hash
+  };
 
   try {
-    let Discord = req.DISCORD;
-    let embed = new Discord.MessageEmbed()
+    const response = await raids_v2_table.create(data);
+    res.json(response);
+  } catch (err) {
+    console.error(err);
+    res.json('ERROR');
+  }
+
+  try {
+    const embed = new Discord.MessageEmbed()
       .setColor('#ff3864')
       .setTitle(
-        transaction_hash !== 'not paid'
+        req.body.transaction_hash !== 'not paid'
           ? 'Paid Submission'
           : 'Unpaid Submission'
       )
       .setURL(
-        transaction_hash !== 'not paid'
-          ? `https://etherscan.io/tx/${transaction_hash}`
+        req.body.transaction_hash !== 'not paid'
+          ? `https://etherscan.io/tx/${req.body.transaction_hash}`
           : null
       )
-      .setAuthor(name)
+      .setAuthor(req.body.name)
       .addFields(
         {
           name: 'Project Name',
-          value: projectName
+          value: req.body.projectName
         },
         {
           name: 'Project Type',
-          value: projectType
+          value: req.body.projectType
         },
         {
           name: 'Specs Link',
-          value: specsLink ? specsLink : 'None Provided'
+          value: req.body.specsLink || 'None Provided'
         },
 
         {
           name: 'Budget Range',
-          value: budgetRange
+          value: req.body.budgetRange
         },
         {
           name: 'Services Required',
-          value: servicesRequired
+          value: req.body.servicesRequired
         },
         {
           name: 'Priority',
-          value: priority
+          value: req.body.priority
         },
         {
           name: 'Email',
-          value: email
+          value: req.body.email
         },
         {
           name: 'Discord',
-          value: discordHandle || 'Not Provided'
+          value: req.body.discordHandle || 'Not Provided'
         },
         {
           name: 'Twitter Handle',
-          value: twitterHandle || 'Not Provided'
+          value: req.body.twitterHandle || 'Not Provided'
         },
         {
           name: 'Telegram Handle',
-          value: telegramHandle || 'Not Provided'
+          value: req.body.telegramHandle || 'Not Provided'
         },
         {
           name: 'Preffered Contact Channel',
-          value: contactType
+          value: req.body.contactType
         }
       )
       .setTimestamp();
@@ -156,12 +128,11 @@ HIREUS_V2_ROUTER.post('/consultation', async (req, res) => {
     req.CLIENT.guilds.cache
       .get(process.env.GUILD_ID)
       .channels.cache.get(process.env.CLIENT_SUBMISSION_CHANNEL_ID)
-      .send(embed);
+      .send({ embeds: [embed] });
   } catch (err) {
     console.log('Error', err);
 
-    let Discord = req.DISCORD;
-    let embed = new Discord.MessageEmbed()
+    const embed = new Discord.MessageEmbed()
       .setColor('#ff3864')
       .setTitle(
         'Something went wrong with the recent client submission notification. Check airtable for data.'
@@ -170,39 +141,30 @@ HIREUS_V2_ROUTER.post('/consultation', async (req, res) => {
     req.CLIENT.guilds.cache
       .get(process.env.GUILD_ID)
       .channels.cache.get(process.env.BOT_CENTER_CHANNEL_ID)
-      .send(embed);
+      .send({ embeds: [embed] });
   }
 });
 
 HIREUS_V2_ROUTER.post('/feedback', async (req, res) => {
-  let { raidID, feedbackOne, feedbackTwo, rating } = req.body;
+  const { raidID, feedbackOne, feedbackTwo, rating } = req.body;
 
-  await req.RAID_CENTRAL_V2_BASE('Raids v2').update(
-    [
-      {
-        id: raidID,
-        fields: {
-          'How did you hear about us?': feedbackOne,
-          'What can be better?': feedbackTwo,
-          Rating: Number(rating)
-        }
-      }
-    ],
-    function (err, records) {
-      if (err) {
-        console.error(err);
-        res.json('ERROR');
-        return;
-      }
-      records.forEach(function (record) {
-        res.json('SUCCESS');
-      });
-    }
-  );
+  const data = {
+    'How did you hear about us?': feedbackOne,
+    'What can be better?': feedbackTwo,
+    Rating: Number(rating)
+  };
 
   try {
-    let Discord = req.DISCORD;
-    let embed = new Discord.MessageEmbed()
+    await raids_v2_table.update(raidID, data);
+
+    res.json('SUCCESS');
+  } catch (err) {
+    console.error(err);
+    res.json('ERROR');
+  }
+
+  try {
+    const embed = new Discord.MessageEmbed()
       .setColor('#ff3864')
       .setTitle('New hireus feedback received')
       .addFields(
@@ -212,18 +174,18 @@ HIREUS_V2_ROUTER.post('/feedback', async (req, res) => {
         },
         {
           name: 'How the user heard about us?',
-          value: feedbackOne ? feedbackOne : 'Not provided.'
+          value: feedbackOne || 'Not provided.'
         },
         {
           name: 'What can be better?',
-          value: feedbackTwo ? feedbackTwo : 'Not provided.'
+          value: feedbackTwo || 'Not provided.'
         }
       );
 
     req.CLIENT.guilds.cache
       .get(process.env.GUILD_ID)
       .channels.cache.get(process.env.WHISPERS_CHANNEL_ID)
-      .send(embed);
+      .send({ embeds: [embed] });
   } catch (err) {
     console.log(err);
   }

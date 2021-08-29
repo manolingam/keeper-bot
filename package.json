@@ -9,6 +9,9 @@
     "start": "node app.js",
     "lint": "eslint ."
   },
+  "engines": {
+    "node": "16.x"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

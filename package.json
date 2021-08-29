@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "deploy": "node deploy-commands.js",
-    "start": "nodemon app.js",
+    "dev": "nodemon app.js",
+    "start": "node app.js",
     "lint": "eslint ."
   },
   "keywords": [],

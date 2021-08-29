@@ -38,45 +38,48 @@ const entryCheck = async (member) => {
         content: `Kicked unauthorized bot, <@${member.id}>`
       });
       member.kick();
-    } else {
-      const captcha = randomWords({ exactly: 1, wordsPerString: 5 });
-
-      let reply = await captchaResponse(
-        member,
-        new MessageEmbed()
-          .setTitle('Portcullis verification')
-          .setDescription(
-            `Welcome, ${member}! I am Sentry from RaidGuild. Please enter the below words exactly within a minute to get yourself verified. Else you will be kicked out for security reasons. You got 2 tries.\n\n**${captcha}**`
-          )
-      );
-
-      // chance 1
-      if (reply === captcha[0]) {
-        tavern.send({ content: welcomeMessages(member) });
-      } else {
-        reply = await captchaResponse(
-          member,
-          new MessageEmbed().setDescription(
-            'Captcha is invalid. Please try again one last time with a proper captcha. Timer is reset to 1 minute.'
-          )
-        );
-
-        // chance 2
-        if (reply === captcha[0]) {
-          tavern.send({ content: welcomeMessages(member) });
-        } else {
-          member.send(
-            new MessageEmbed().setDescription(
-              'Sorry, no valid response received within the time. Try joining the server again if you missed it.'
-            )
-          );
-          commandCenter.send({
-            content: `Kicked <@${member.id}> due to portcullis verification fail.`
-          });
-          member.kick();
-        }
-      }
+      return;
     }
+
+    const captcha = randomWords({ exactly: 1, wordsPerString: 5 });
+
+    let reply = await captchaResponse(
+      member,
+      new MessageEmbed()
+        .setTitle('Portcullis verification')
+        .setDescription(
+          `Welcome, ${member}! I am Sentry from RaidGuild. Please enter the below words exactly within a minute to get yourself verified. Else you will be kicked out for security reasons. You got 2 tries.\n\n**${captcha}**`
+        )
+    );
+
+    // chance 1
+    if (reply === captcha[0]) {
+      tavern.send({ content: welcomeMessages(member) });
+      return;
+    }
+
+    reply = await captchaResponse(
+      member,
+      new MessageEmbed().setDescription(
+        'Captcha is invalid. Please try again one last time with a proper captcha. Timer is reset to 1 minute.'
+      )
+    );
+
+    // chance 2
+    if (reply === captcha[0]) {
+      tavern.send({ content: welcomeMessages(member) });
+      return;
+    }
+
+    member.send(
+      new MessageEmbed().setDescription(
+        'Sorry, no valid response received within the time. Try joining the server again if you missed it.'
+      )
+    );
+    commandCenter.send({
+      content: `Kicked <@${member.id}> due to portcullis verification fail.`
+    });
+    member.kick();
   } catch (err) {
     console.log(err);
   }

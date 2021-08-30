@@ -39,7 +39,7 @@ const molochRoleClaim = (client) => {
     client.emojis.cache.find((emoji) => emoji.name === emojiName);
 
   const emojis = {
-    molochsoldier: 'moloch soldier'
+    molochsoldier: 'Moloch Soldier'
   };
 
   const reactions = [];
@@ -67,7 +67,18 @@ const molochRoleClaim = (client) => {
 
   client.on('messageReactionAdd', (reaction, user) => {
     if (reaction.message.channel.id === process.env.UNLOCK_CHANNEL_ID) {
-      handleReaction(reaction, user, true, emojis);
+      const member = user.client.guilds.cache
+        .get(process.env.GUILD_ID)
+        .members.cache.get(user.id);
+
+      const isMember = member.roles.cache.has(process.env.MEMBER_ROLE_ID);
+      const isCohort = member.roles.cache.has(process.env.COHORT_ROLE_ID);
+
+      if (!isMember && !isCohort) {
+        handleReaction(reaction, user, true, emojis);
+      } else {
+        reaction.users.remove(user.id);
+      }
     }
   });
 

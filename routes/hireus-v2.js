@@ -96,7 +96,7 @@ HIREUS_V2_ROUTER.post('/consultation', async (req, res) => {
         },
         {
           name: 'Services Required',
-          value: req.body.servicesRequired
+          value: req.body.servicesRequired.toString()
         },
         {
           name: 'Priority',
@@ -140,7 +140,7 @@ HIREUS_V2_ROUTER.post('/consultation', async (req, res) => {
 
     req.CLIENT.guilds.cache
       .get(process.env.GUILD_ID)
-      .channels.cache.get(process.env.BOT_CENTER_CHANNEL_ID)
+      .channels.cache.get(process.env.CLIENT_SUBMISSION_CHANNEL_ID)
       .send({ embeds: [embed] });
   }
 });

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 const Web3 = require('web3');
 const { MessageEmbed } = require('discord.js');
 
@@ -32,10 +31,11 @@ const subscribeEvent = (client) => {
     PairContract.events
       .Swap(
         {
-          fromBlock: 17909100
+          fromBlock: 17908100
         },
         function (error, event) {
           if (error) console.log(error);
+          if (event) console.log(event);
         }
       )
       .on('connected', function (subscriptionId) {
@@ -61,7 +61,7 @@ const subscribeEvent = (client) => {
           'ether'
         );
 
-        if (raid_in >= '10' || raid_out >= '10') {
+        if (parseInt(raid_in, 10) >= 10 || parseInt(raid_out, 10) >= 10) {
           console.log('event', {
             hash: event.transactionHash,
             sender: event.returnValues.sender,
@@ -101,7 +101,8 @@ const subscribeEvent = (client) => {
         }
       })
       .on('error', function (error, receipt) {
-        console.log('Error', error);
+        if (error) console.log('Error', error);
+        if (receipt) console.log('Receipt', receipt);
 
         const embed = new MessageEmbed()
           .setColor('#ff3864')
@@ -116,7 +117,6 @@ const subscribeEvent = (client) => {
     const embed = new MessageEmbed()
       .setColor('#ff3864')
       .setDescription('Something went wrong with the swap listener.');
-
     client.guilds.cache
       .get(process.env.GUILD_ID)
       .channels.cache.get(process.env.COMMAND_CENTER_ID)

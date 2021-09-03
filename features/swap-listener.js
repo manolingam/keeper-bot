@@ -31,7 +31,7 @@ const subscribeEvent = (client) => {
     PairContract.events
       .Swap(
         {
-          fromBlock: 17908100
+          fromBlock: 17908642
         },
         function (error, event) {
           if (error) console.log(error);
@@ -74,11 +74,13 @@ const subscribeEvent = (client) => {
           const embed = new MessageEmbed()
             .setColor('#ff3864')
             .setTitle('Token Swapped')
+            .setAuthor(
+              '$RAID',
+              'https://res.cloudinary.com/saimano/image/upload/v1630599485/RaidGuild/icons/token/raid_200_oswlvz.png',
+              'https://www.coingecko.com/en/coins/raid-token'
+            )
             .setURL(
               `https://blockscout.com/xdai/mainnet/tx/${event.transactionHash}`
-            )
-            .setThumbnail(
-              'https://res.cloudinary.com/saimano/image/upload/v1630599485/RaidGuild/icons/token/raid_200_oswlvz.png'
             )
             .addFields(
               {
@@ -103,15 +105,6 @@ const subscribeEvent = (client) => {
       .on('error', function (error, receipt) {
         if (error) console.log('Error', error);
         if (receipt) console.log('Receipt', receipt);
-
-        const embed = new MessageEmbed()
-          .setColor('#ff3864')
-          .setDescription('Something went wrong with the xdai websocket.');
-
-        client.guilds.cache
-          .get(process.env.GUILD_ID)
-          .channels.cache.get(process.env.COMMAND_CENTER_ID)
-          .send({ embeds: [embed] });
       });
   } catch (err) {
     const embed = new MessageEmbed()

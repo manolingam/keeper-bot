@@ -31,7 +31,7 @@ const subscribeEvent = (client) => {
     PairContract.events
       .Swap(
         {
-          fromBlock: 17908642
+          fromBlock: 17909160
         },
         function (error, event) {
           if (error) console.log(error);
@@ -61,7 +61,7 @@ const subscribeEvent = (client) => {
           'ether'
         );
 
-        if (parseInt(raid_in, 10) >= 10 || parseInt(raid_out, 10) >= 10) {
+        if (parseInt(raid_in, 10) >= 250 || parseInt(raid_out, 10) >= 250) {
           console.log('event', {
             hash: event.transactionHash,
             sender: event.returnValues.sender,
@@ -73,7 +73,9 @@ const subscribeEvent = (client) => {
 
           const embed = new MessageEmbed()
             .setColor('#ff3864')
-            .setTitle('Token Swapped')
+            .setTitle(
+              raid_in === '0' ? 'Swap RAID for WETH' : 'Swap WETH for RAID'
+            )
             .setAuthor(
               '$RAID',
               'https://res.cloudinary.com/saimano/image/upload/v1630599485/RaidGuild/icons/token/raid_200_oswlvz.png',
@@ -84,12 +86,12 @@ const subscribeEvent = (client) => {
             )
             .addFields(
               {
-                name: raid_in === '0' ? 'RAID Bought' : 'RAID Sold',
+                name: raid_in === '0' ? 'RAID Out' : 'RAID In',
                 value:
                   raid_in === '0' ? raid_out.toString() : raid_in.toString()
               },
               {
-                name: weth_in === '0' ? 'WETH Bought' : 'WETH Sold',
+                name: weth_in === '0' ? 'WETH Out' : 'WETH In',
                 value:
                   weth_in === '0' ? weth_out.toString() : weth_in.toString()
               }

@@ -23,10 +23,10 @@ const welcomeMessages = (member) => {
     `Ready player <@${member.id}>`
   ];
 
-  var greeting =
+  const greeting =
     randomGreetings[Math.floor(Math.random() * randomGreetings.length)];
 
   return greeting;
 };
 
-exports.welcomeMessages = welcomeMessages;
+module.exports = welcomeMessages;

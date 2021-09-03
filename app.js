@@ -1,64 +1,43 @@
-// Package imports
-const Discord = require('discord.js');
+/* eslint-disable global-require */
+/* eslint-disable import/no-dynamic-require */
+const { Collection, Intents, Client } = require('discord.js');
+const dotenv = require('dotenv');
+const fs = require('fs');
 
-const WOKCommands = require('wokcommands');
+dotenv.config();
 
-const { roleClaim } = require('./features/role-claim');
-const { anonymousSuggestion } = require('./features/anonymous-suggestion');
-const { entryCheck } = require('./features/portcullis-captcha');
-
-const client = new Discord.Client({
-  partials: ['MESSAGE', 'REACTION']
+// initialize discord client
+const client = new Client({
+  partials: ['MESSAGE', 'REACTION', 'CHANNEL'],
+  intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MEMBERS,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    Intents.FLAGS.DIRECT_MESSAGES
+  ]
 });
 
-require('dotenv').config();
-
-let portcullis = true;
-
-client.on('ready', async () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-
-  new WOKCommands(client, {
-    commandsDir: 'commands',
-    testServers: [process.env.GUILD_ID],
-    showWarns: false
-  });
-
-  roleClaim(client);
-  anonymousSuggestion(client);
-
-  require('./server');
+// creating commands reader
+client.commands = new Collection();
+const commandFiles = fs
+  .readdirSync('./commands')
+  .filter((file) => file.endsWith('.js'));
+commandFiles.forEach((file) => {
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.data.name, command);
 });
 
-client.on('guildMemberAdd', (member) => {
-  entryCheck(member, portcullis);
-});
-
-client.on('message', (message) => {
-  if (!message.member) return;
-  try {
-    if (message.member.id === process.env.OWNER_ID) {
-      let invocation = message.content.split(' ');
-      if (invocation[1] === 'portcullis' && invocation[0] === 'lift') {
-        portcullis = false;
-
-        return message.channel.send(
-          new Discord.MessageEmbed()
-            .setDescription('Portcullis lifted!')
-            .setColor('#ff3864')
-        );
-      } else if (invocation[1] === 'portcullis' && invocation[0] === 'lower') {
-        portcullis = true;
-
-        return message.channel.send(
-          new Discord.MessageEmbed()
-            .setDescription('Portcullis lowered!')
-            .setColor('#ff3864')
-        );
-      }
-    }
-  } catch (err) {
-    console.log(err);
+// creating events reader
+const eventFiles = fs
+  .readdirSync('./events')
+  .filter((file) => file.endsWith('.js'));
+eventFiles.forEach((file) => {
+  const event = require(`./events/${file}`);
+  if (event.once) {
+    client.once(event.name, (...args) => event.execute(...args));
+  } else {
+    client.on(event.name, (...args) => event.execute(...args));
   }
 });
 

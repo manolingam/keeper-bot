@@ -1,60 +1,53 @@
-const Airtable = require('airtable');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
+const Airtable = require('airtable');
 
 Airtable.configure({
   endpointUrl: 'https://api.airtable.com',
   apiKey: process.env.API_KEY
 });
 
-let treasury_base = Airtable.base(process.env.TREASURY_BASE_ID);
+const base = Airtable.base(process.env.TREASURY_BASE_ID);
+const direct_transfers_table = base('Direct Transfers');
 
 module.exports = {
-  slash: true,
-  testOnly: true,
-  name: 'register-tx',
-  description: 'Adds info about a direct fund transfer to the guild.',
-  minArgs: 2,
-  expectedArgs: '<brief> <tx-link>',
-  callback: ({ args, interaction }) => {
+  data: new SlashCommandBuilder()
+    .setName('register-tx')
+    .setDescription('Adds info about a direct fund transfer to the guild')
+    .addStringOption((option) =>
+      option
+        .setName('brief')
+        .setDescription('A short brief about the tx')
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName('tx-link')
+        .setDescription('The transaction link')
+        .setRequired(true)
+    )
+    .setDefaultPermission(false),
+  async execute(interaction) {
     try {
-      const isMember = interaction.member.roles.includes(
-        process.env.MEMBER_ROLE_ID
-      );
+      const brief = interaction.options.getString('brief');
+      const tx = interaction.options.getString('tx-link');
 
-      if (!isMember)
-        return new MessageEmbed().setDescription(
-          'Only members can use this command.'
-        );
+      const data = {
+        Description: brief,
+        'Etherscan Link': tx
+      };
 
-      const [brief, tx] = args;
+      await interaction.deferReply();
 
-      treasury_base('Direct Transfers').create(
-        [
-          {
-            fields: {
-              Description: brief,
-              'Etherscan Link': tx
-            }
-          }
-        ],
-        function (err, records) {
-          if (err) {
-            console.error(err);
-            return;
-          }
-          records.forEach(function (record) {
-            console.log(record.getId());
-          });
-        }
-      );
+      await direct_transfers_table.create(data);
 
-      return new MessageEmbed()
+      const embed = new MessageEmbed()
         .setDescription('TX Data posted to Airtable.')
         .setColor('#ff3864');
+
+      await interaction.editReply({ embeds: [embed] });
     } catch (err) {
-      return new MessageEmbed()
-        .setDescription('Something went wrong!')
-        .setColor('#ff3864');
+      console.log(err);
     }
   }
 };

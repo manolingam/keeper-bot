@@ -1,14 +1,15 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 
 module.exports = {
-  slash: true,
-  testOnly: true,
-  name: 'primary-roles-count',
-  description: 'Returns the total number of users in each primary role.',
-  callback: ({ channel }) => {
+  data: new SlashCommandBuilder()
+    .setName('primary-roles-count')
+    .setDescription('Returns the total number of users in each primary role.')
+    .setDefaultPermission(true),
+  async execute(interaction) {
     try {
-      let roles = [];
-      let filterRoles = [
+      const roles = [];
+      const filterRoles = [
         '@everyone',
         'Available',
         'xDai-Faucet',
@@ -30,29 +31,27 @@ module.exports = {
       ];
 
       let ignoredRoles = '';
-      filterRoles.map((role) => {
+      filterRoles.forEach((role) => {
         if (role !== '@everyone') ignoredRoles += `__*${role}*__\t\t`;
       });
 
-      channel.guild.roles.cache.forEach((role) => {
+      interaction.guild.roles.cache.forEach((role) => {
         if (!filterRoles.includes(role.name)) {
-          let count = channel.guild.roles.cache.get(role.id).members.size;
+          const count = interaction.guild.roles.cache.get(role.id).members.size;
           roles.push(`${role.name} - ${count}\n`);
         }
       });
 
-      let embed = new MessageEmbed()
+      const embed = new MessageEmbed()
         .setColor('#ff3864')
         .setDescription(
           `Counted in the primary roles while ignoring these.\n\n${ignoredRoles}`
         )
-        .addFields({ name: 'Primary roles', value: roles });
+        .addFields({ name: 'Primary roles', value: roles.toString() });
 
-      return embed;
+      await interaction.reply({ embeds: [embed] });
     } catch (err) {
-      return new MessageEmbed()
-        .setDescription('Something went wrong!')
-        .setColor('#ff3864');
+      console.log(err);
     }
   }
 };

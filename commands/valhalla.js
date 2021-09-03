@@ -1,52 +1,41 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 
 module.exports = {
-  slash: true,
-  testOnly: true,
-  name: 'to-valhalla',
-  description: 'Sends a channel to Valhalla.',
-  minArgs: 1,
-  expectedArgs: '<channel>',
-  callback: ({ channel, args, interaction }) => {
-    let [channelId] = args;
-    channelId = channelId.substring(2, channelId.length - 1);
-
+  data: new SlashCommandBuilder()
+    .setName('to-valhalla')
+    .setDescription('Sends a channel to Valhalla')
+    .setDefaultPermission(false),
+  async execute(interaction) {
     try {
-      const isMember = interaction.member.roles.includes(
-        process.env.MEMBER_ROLE_ID
-      );
+      // const channel = interaction.options.getChannel('destination');
 
-      if (!isMember)
-        return new MessageEmbed().setDescription(
-          'Only members can use this command.'
-        );
+      // interaction.client.guilds.cache
+      //   .get(process.env.GUILD_ID)
+      //   .channels.cache.get(channel.id)
+      //   .setParent(process.env.VALHALLA_6_21_CHANNEL_ID);
 
-      let _channel = channel.guild.channels.cache.get(channelId);
-      let category = channel.guild.channels.cache.find(
-        (c) => c.name == 'Valhalla 6/21' && c.type == 'category'
-      );
+      // channel.setParent(process.env.VALHALLA_6_21_CHANNEL_ID);
 
-      if (_channel.parentID == process.env.VALHALLA_6_21_CHANNEL_ID) {
-        let embed = new MessageEmbed()
+      if (
+        interaction.channel.parentId === process.env.VALHALLA_6_21_CHANNEL_ID
+      ) {
+        const embed = new MessageEmbed()
           .setColor('#ff3864')
           .setDescription('This is already in Valhalla!');
 
-        return embed;
+        await interaction.reply({ embeds: [embed] });
+      } else {
+        interaction.channel.setParent(process.env.VALHALLA_6_21_CHANNEL_ID);
+
+        const embed = new MessageEmbed()
+          .setColor('#ff3864')
+          .setDescription('Command executed');
+
+        await interaction.reply({ embeds: [embed] });
       }
-
-      _channel.setParent(category.id);
-
-      let embed = new MessageEmbed()
-        .setColor('#ff3864')
-        .setDescription('Sent to Valhalla 6/21.');
-
-      return embed;
     } catch (err) {
       console.log(err);
-      let embed = new MessageEmbed()
-        .setColor('#ff3864')
-        .setDescription('Invalid Argument.');
-      return embed;
     }
   }
 };

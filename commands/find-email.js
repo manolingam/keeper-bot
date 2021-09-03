@@ -1,5 +1,9 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const { Client } = require('pg');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const client = new Client({
   user: process.env.PG_USER,
@@ -12,35 +16,30 @@ const client = new Client({
 client.connect();
 
 module.exports = {
-  slash: true,
-  testOnly: true,
-  name: 'find-member-email',
-  description: 'Finds the email address of a member with possible matches.',
-  minArgs: 1,
-  expectedArgs: '<member name>',
-  callback: async ({ args, interaction }) => {
+  data: new SlashCommandBuilder()
+    .setName('find-email')
+    .setDescription('Looks for the email address of the member')
+    .addStringOption((option) =>
+      option
+        .setName('name')
+        .setDescription('Member name to find the email for')
+        .setRequired(true)
+    )
+    .setDefaultPermission(false),
+  async execute(interaction) {
     try {
-      const isMember = interaction.member.roles.includes(
-        process.env.MEMBER_ROLE_ID
-      );
+      const name = interaction.options.getString('name');
+      const results = [];
 
-      if (!isMember)
-        return new MessageEmbed().setDescription(
-          'Only members can use this command.'
-        );
-
-      let [name] = args;
-      let results = [];
-
-      let { rows } = await client.query(
+      const { rows } = await client.query(
         `select name, email from member_registry where LOWER(name) LIKE '%${name}%'`
       );
 
-      rows.map((match) => {
+      rows.forEach((match) => {
         results.push({ name: match.name, value: match.email });
       });
 
-      let embed = new MessageEmbed()
+      const embed = new MessageEmbed()
         .setDescription(
           results.length > 0
             ? 'Found the following matches.'
@@ -48,11 +47,9 @@ module.exports = {
         )
         .setColor('#ff3864')
         .addFields(results);
-      return embed;
+      await interaction.reply({ embeds: [embed], ephemeral: true });
     } catch (err) {
-      return new MessageEmbed()
-        .setDescription('Something went wrong!')
-        .setColor('#ff3864');
+      console.log(err);
     }
   }
 };

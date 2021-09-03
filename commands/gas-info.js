@@ -1,40 +1,39 @@
-const axios = require('axios');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
+const axios = require('axios');
 
 module.exports = {
-  slash: true,
-  testOnly: true,
-  name: 'gas-info',
-  description: 'Returns gas price stats.',
-  callback: async ({}) => {
+  data: new SlashCommandBuilder()
+    .setName('gas-info')
+    .setDescription('Returns gas price stats')
+    .setDefaultPermission(true),
+  async execute(interaction) {
     try {
-      let res = await axios.get(
+      const res = await axios.get(
         'https://ethgasstation.info/api/ethgasAPI.json'
       );
 
-      let embed = new MessageEmbed()
+      const embed = new MessageEmbed()
         .setColor('#ff3864')
         .setTimestamp()
         .addFields(
           {
             name: 'Fast',
-            value: res.data.fast / 10
+            value: (res.data.fast / 10).toString()
           },
           {
             name: 'Standard',
-            value: res.data.average / 10
+            value: (res.data.average / 10).toString()
           },
           {
             name: 'Safelow',
-            value: res.data.safeLow / 10
+            value: (res.data.safeLow / 10).toString()
           }
         );
 
-      return embed;
+      await interaction.reply({ embeds: [embed] });
     } catch (err) {
-      return new MessageEmbed()
-        .setDescription('Something went wrong. Try again later!')
-        .setColor('#ff3864');
+      console.log(err);
     }
   }
 };

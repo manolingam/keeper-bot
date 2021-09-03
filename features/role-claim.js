@@ -14,8 +14,8 @@ const handleReaction = (reaction, user, add, emojis) => {
     return;
   }
 
-  const role = guild.roles.cache.find((role) => role.name === roleName);
-  const member = guild.members.cache.find((member) => member.id === user.id);
+  const role = guild.roles.cache.find((_role) => _role.name === roleName);
+  const member = guild.members.cache.find((_member) => _member.id === user.id);
 
   if (add) {
     member.roles.add(role);
@@ -65,15 +65,15 @@ const roleClaim = (client) => {
 
   let emojiText = '';
 
-  for (const key in emojis) {
+  Object.keys(emojis).forEach((key) => {
     const emoji = getEmoji(key);
     reactions.push(emoji);
     const role = emojis[key];
     emojiText += `${emoji} - **${role}**\n\n`;
-  }
+  });
 
   const channel = client.channels.cache.get(startHereChannelID);
-  let embed = new MessageEmbed()
+  const embed = new MessageEmbed()
     .setColor('#ff3864')
     .setTitle('Role Selection')
     .setDescription(
@@ -101,4 +101,4 @@ const roleClaim = (client) => {
   });
 };
 
-exports.roleClaim = roleClaim;
+module.exports = roleClaim;

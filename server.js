@@ -6,6 +6,8 @@ const PAYLOAD_ROUTER = require('./routes/payload');
 const HIREUS_V2_ROUTER = require('./routes/hireus-v2');
 const ESCROW_ROUTER = require('./routes/escrow');
 
+const subscribeEvent = require('./features/swap-listener');
+
 const createServer = () => {
   const client = new Client({
     partials: ['MESSAGE', 'REACTION', 'CHANNEL'],
@@ -19,6 +21,8 @@ const createServer = () => {
   });
 
   client.once('ready', () => {
+    subscribeEvent(client);
+
     const app = express();
 
     app.use(express.json());

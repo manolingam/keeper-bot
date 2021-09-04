@@ -81,7 +81,7 @@ const molochRoleClaim = (client) => {
         !isMember &&
         !isCohort &&
         !isSoldier &&
-        member.joinedTimestamp + 120000 > Date.now()
+        member.joinedTimestamp + 120000 < Date.now()
       ) {
         handleReaction(reaction, user, true, emojis);
       } else {

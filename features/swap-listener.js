@@ -31,7 +31,7 @@ const subscribeEvent = (client) => {
     PairContract.events
       .Swap(
         {
-          fromBlock: 17909160
+          fromBlock: 17916698
         },
         function (error, event) {
           if (error) console.log(error);
@@ -61,7 +61,7 @@ const subscribeEvent = (client) => {
           'ether'
         );
 
-        if (parseInt(raid_in, 10) >= 250 || parseInt(raid_out, 10) >= 250) {
+        if (parseInt(raid_in, 10) >= 500 || parseInt(raid_out, 10) >= 500) {
           console.log('event', {
             hash: event.transactionHash,
             sender: event.returnValues.sender,
@@ -100,7 +100,7 @@ const subscribeEvent = (client) => {
 
           client.guilds.cache
             .get(process.env.GUILD_ID)
-            .channels.cache.get(process.env.COMMAND_CENTER_ID)
+            .channels.cache.get(process.env.RAID_SWAP_ALERT_CHANNEL_ID)
             .send({ embeds: [embed] });
         }
       })

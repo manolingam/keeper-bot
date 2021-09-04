@@ -31,7 +31,7 @@ const subscribeEvent = (client) => {
     PairContract.events
       .Swap(
         {
-          fromBlock: 17916698
+          fromBlock: 17921694
         },
         function (error, event) {
           if (error) console.log(error);

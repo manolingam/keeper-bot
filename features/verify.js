@@ -71,10 +71,15 @@ const molochRoleClaim = (client) => {
         .get(process.env.GUILD_ID)
         .members.cache.get(user.id);
 
+      if (member.joinedTimestamp + 120000 < Date.now()) return;
+
       const isMember = member.roles.cache.has(process.env.MEMBER_ROLE_ID);
       const isCohort = member.roles.cache.has(process.env.COHORT_ROLE_ID);
+      const isSoldier = member.roles.cache.has(
+        process.env.MOLOCH_SOLDIER_ROLE_ID
+      );
 
-      if (!isMember && !isCohort) {
+      if (!isMember && !isCohort && !isSoldier) {
         handleReaction(reaction, user, true, emojis);
       } else {
         reaction.users.remove(user.id);

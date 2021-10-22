@@ -54,6 +54,7 @@ const entryCheck = async (member) => {
 
     // chance 1
     if (reply === captcha[0]) {
+      member.roles.add(process.env.MOLOCH_SOLDIER_ROLE_ID);
       tavern.send({ content: welcomeMessages(member) });
       return;
     }
@@ -67,6 +68,7 @@ const entryCheck = async (member) => {
 
     // chance 2
     if (reply === captcha[0]) {
+      member.roles.add(process.env.MOLOCH_SOLDIER_ROLE_ID);
       tavern.send({ content: welcomeMessages(member) });
       return;
     }

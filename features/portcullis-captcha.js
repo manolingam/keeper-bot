@@ -33,11 +33,18 @@ const entryCheck = async (member) => {
       process.env.COMMAND_CENTER_ID
     );
 
-    if (member.user.bot) {
+    if (member.user.bot && process.env.ALLOW_BOTS === 'false') {
       commandCenter.send({
         content: `Kicked unauthorized bot, <@${member.id}>`
       });
       member.kick();
+      return;
+    }
+
+    if (member.user.bot && process.env.ALLOW_BOTS === 'true') {
+      commandCenter.send({
+        content: `Bot <@${member.id}> has entered the tavern`
+      });
       return;
     }
 

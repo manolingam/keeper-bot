@@ -1,4 +1,5 @@
 const anonymousSuggestion = require('../features/anonymous-suggestions');
+const { consoleLogger, discordLogger } = require('../utils/logger');
 
 // let portcullis = true;
 
@@ -33,7 +34,8 @@ module.exports = {
       // }
       // }
     } catch (err) {
-      console.log(err);
+      consoleLogger.error(err);
+      discordLogger('Error caught in message event.');
     }
   }
 };

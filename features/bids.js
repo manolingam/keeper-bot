@@ -1,65 +1,70 @@
 const Web3 = require('web3');
 const { MessageEmbed } = require('discord.js');
 
-const AuctionABI = require('../utils/auction-abi.json');
+const AuctionABI = require('../abi/auction-abi.json');
+const { consoleLogger, discordLogger } = require('../utils/logger');
+const { SECRETS } = require('../config');
 
 const newBidListener = (AuctionContract, currentBlockNumber, web3, client) => {
-  AuctionContract.events
-    .NewBid(
-      {
-        fromBlock: currentBlockNumber
-      },
-      function (error, event) {
-        if (error) console.log(error);
-        if (event) console.log(event);
-      }
-    )
-    .on('connected', function (subscriptionId) {
-      console.log(`Connection Opened with subscription ID, ${subscriptionId}!`);
-    })
-    .on('data', function (event) {
-      const bidAmount = web3.utils.fromWei(event.returnValues.amount, 'ether');
-      const { submitter } = event.returnValues;
-      const { id } = event.returnValues;
+  try {
+    AuctionContract.events
+      .NewBid(
+        {
+          fromBlock: currentBlockNumber
+        },
+        function (error, event) {
+          if (error) console.log(error);
+          if (event) console.log(event);
+        }
+      )
+      .on('connected', function (subscriptionId) {
+        consoleLogger.info(
+          `Connection Opened with subscription ID, ${subscriptionId}!`
+        );
+      })
+      .on('data', function (event) {
+        const bidAmount = web3.utils.fromWei(
+          event.returnValues.amount,
+          'ether'
+        );
+        const { submitter } = event.returnValues;
+        const { id } = event.returnValues;
 
-      console.log('event', {
-        hash: event.transactionHash,
-        'Bid Amount': bidAmount,
-        Submitter: submitter,
-        id
+        const embed = new MessageEmbed()
+          .setColor('#ff3864')
+          .setTitle('New Bid')
+          .setURL(
+            `https://blockscout.com/xdai/mainnet/tx/${event.transactionHash}`
+          )
+          .addFields(
+            {
+              name: 'ID',
+              value: id.toString()
+            },
+            {
+              name: 'Bid Amount',
+              value: `${bidAmount.toString()} RAID`
+            },
+            {
+              name: 'Submitter',
+              value: submitter.toString()
+            }
+          )
+          .setTimestamp();
+
+        client.guilds.cache
+          .get(SECRETS.GUILD_ID)
+          .channels.cache.get(SECRETS.RAID_SWAP_ALERT_CHANNEL_ID)
+          .send({ embeds: [embed] });
+      })
+      .on('error', function (error, receipt) {
+        if (error) consoleLogger.error(error);
+        if (receipt) consoleLogger.info(receipt);
       });
-
-      const embed = new MessageEmbed()
-        .setColor('#ff3864')
-        .setTitle('New Bid')
-        .setURL(
-          `https://blockscout.com/xdai/mainnet/tx/${event.transactionHash}`
-        )
-        .addFields(
-          {
-            name: 'ID',
-            value: id.toString()
-          },
-          {
-            name: 'Bid Amount',
-            value: `${bidAmount.toString()} RAID`
-          },
-          {
-            name: 'Submitter',
-            value: submitter.toString()
-          }
-        )
-        .setTimestamp();
-
-      client.guilds.cache
-        .get(process.env.GUILD_ID)
-        .channels.cache.get(process.env.RAID_SWAP_ALERT_CHANNEL_ID)
-        .send({ embeds: [embed] });
-    })
-    .on('error', function (error, receipt) {
-      if (error) console.log('Error', error);
-      if (receipt) console.log('Receipt', receipt);
-    });
+  } catch (err) {
+    consoleLogger.error(err);
+    discordLogger('Error caught in new bid listener.');
+  }
 };
 
 const bidIncreaseListener = (
@@ -68,112 +73,114 @@ const bidIncreaseListener = (
   web3,
   client
 ) => {
-  AuctionContract.events
-    .BidIncreased(
-      {
-        fromBlock: currentBlockNumber
-      },
-      function (error, event) {
-        if (error) console.log(error);
-        if (event) console.log(event);
-      }
-    )
-    .on('connected', function (subscriptionId) {
-      console.log(`Connection Opened with subscription ID, ${subscriptionId}!`);
-    })
-    .on('data', function (event) {
-      const newAmount = web3.utils.fromWei(
-        event.returnValues.newAmount,
-        'ether'
-      );
-      const { id } = event.returnValues;
+  try {
+    AuctionContract.events
+      .BidIncreased(
+        {
+          fromBlock: currentBlockNumber
+        },
+        function (error, event) {
+          if (error) console.log(error);
+          if (event) console.log(event);
+        }
+      )
+      .on('connected', function (subscriptionId) {
+        consoleLogger.info(
+          `Connection Opened with subscription ID, ${subscriptionId}!`
+        );
+      })
+      .on('data', function (event) {
+        const newAmount = web3.utils.fromWei(
+          event.returnValues.newAmount,
+          'ether'
+        );
+        const { id } = event.returnValues;
 
-      console.log('event', {
-        hash: event.transactionHash,
-        'New Bid Amount': newAmount,
-        id
+        const embed = new MessageEmbed()
+          .setColor('#ff3864')
+          .setTitle('Bid Increase')
+          .setURL(
+            `https://blockscout.com/xdai/mainnet/tx/${event.transactionHash}`
+          )
+          .addFields(
+            {
+              name: 'ID',
+              value: id.toString()
+            },
+            {
+              name: 'New Bid Amount',
+              value: `${newAmount.toString()} RAID`
+            }
+          )
+          .setTimestamp();
+
+        client.guilds.cache
+          .get(SECRETS.GUILD_ID)
+          .channels.cache.get(SECRETS.RAID_SWAP_ALERT_CHANNEL_ID)
+          .send({ embeds: [embed] });
+      })
+      .on('error', function (error, receipt) {
+        if (error) consoleLogger.error(error);
+        if (receipt) consoleLogger.info(receipt);
       });
-
-      const embed = new MessageEmbed()
-        .setColor('#ff3864')
-        .setTitle('Bid Increase')
-        .setURL(
-          `https://blockscout.com/xdai/mainnet/tx/${event.transactionHash}`
-        )
-        .addFields(
-          {
-            name: 'ID',
-            value: id.toString()
-          },
-          {
-            name: 'New Bid Amount',
-            value: `${newAmount.toString()} RAID`
-          }
-        )
-        .setTimestamp();
-
-      client.guilds.cache
-        .get(process.env.GUILD_ID)
-        .channels.cache.get(process.env.RAID_SWAP_ALERT_CHANNEL_ID)
-        .send({ embeds: [embed] });
-    })
-    .on('error', function (error, receipt) {
-      if (error) console.log('Error', error);
-      if (receipt) console.log('Receipt', receipt);
-    });
+  } catch (err) {
+    consoleLogger.error(err);
+    discordLogger('Error caught in bid increase listener.');
+  }
 };
 
 const bidAccepted = (AuctionContract, currentBlockNumber, client) => {
-  AuctionContract.events
-    .BidAccepted(
-      {
-        fromBlock: currentBlockNumber
-      },
-      function (error, event) {
-        if (error) console.log(error);
-        if (event) console.log(event);
-      }
-    )
-    .on('connected', function (subscriptionId) {
-      console.log(`Connection Opened with subscription ID, ${subscriptionId}!`);
-    })
-    .on('data', function (event) {
-      const { acceptedBy } = event.returnValues;
-      const { id } = event.returnValues;
+  try {
+    AuctionContract.events
+      .BidAccepted(
+        {
+          fromBlock: currentBlockNumber
+        },
+        function (error, event) {
+          if (error) consoleLogger.error(error);
+          if (event) consoleLogger.info(event);
+        }
+      )
+      .on('connected', function (subscriptionId) {
+        consoleLogger.info(
+          `Connection Opened with subscription ID, ${subscriptionId}!`
+        );
+      })
+      .on('data', function (event) {
+        const { acceptedBy } = event.returnValues;
+        const { id } = event.returnValues;
 
-      console.log('event', {
-        hash: event.transactionHash,
-        'Accepted By': acceptedBy,
-        id
+        const embed = new MessageEmbed()
+          .setColor('#ff3864')
+          .setTitle('Bid Accepted')
+          .setURL(
+            `https://blockscout.com/xdai/mainnet/tx/${event.transactionHash}`
+          )
+          .addFields(
+            {
+              name: 'ID',
+              value: id.toString()
+            },
+            {
+              name: 'Accepted By',
+              value: acceptedBy.toString()
+            }
+          )
+          .setTimestamp();
+
+        client.guilds.cache
+          .get(SECRETS.GUILD_ID)
+          .channels.cache.get(SECRETS.RAID_SWAP_ALERT_CHANNEL_ID)
+          .send({ embeds: [embed] });
+      })
+      .on('error', function (error, receipt) {
+        if (error) consoleLogger.error(error);
+        if (receipt) consoleLogger.info(receipt);
       });
-
-      const embed = new MessageEmbed()
-        .setColor('#ff3864')
-        .setTitle('Bid Accepted')
-        .setURL(
-          `https://blockscout.com/xdai/mainnet/tx/${event.transactionHash}`
-        )
-        .addFields(
-          {
-            name: 'ID',
-            value: id.toString()
-          },
-          {
-            name: 'Accepted By',
-            value: acceptedBy.toString()
-          }
-        )
-        .setTimestamp();
-
-      client.guilds.cache
-        .get(process.env.GUILD_ID)
-        .channels.cache.get(process.env.RAID_SWAP_ALERT_CHANNEL_ID)
-        .send({ embeds: [embed] });
-    })
-    .on('error', function (error, receipt) {
-      if (error) console.log('Error', error);
-      if (receipt) console.log('Receipt', receipt);
-    });
+  } catch (err) {
+    consoleLogger.error(err);
+    discordLogger('Error caught in bid accepted listener.');
+  }
 };
 
 const subscribeEvent = async (client) => {
@@ -206,13 +213,8 @@ const subscribeEvent = async (client) => {
     bidIncreaseListener(AuctionContract, currentBlockNumber, web3, client);
     bidAccepted(AuctionContract, currentBlockNumber, client);
   } catch (err) {
-    const embed = new MessageEmbed()
-      .setColor('#ff3864')
-      .setDescription('Something went wrong with the bids listener.');
-    client.guilds.cache
-      .get(process.env.GUILD_ID)
-      .channels.cache.get(process.env.COMMAND_CENTER_ID)
-      .send({ embeds: [embed] });
+    consoleLogger.error(err);
+    discordLogger('Error caught in bids listener.');
   }
 };
 

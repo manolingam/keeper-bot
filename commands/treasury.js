@@ -2,12 +2,15 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const Airtable = require('airtable');
 
+const { consoleLogger, discordLogger } = require('../utils/logger');
+const { SECRETS } = require('../config');
+
 Airtable.configure({
   endpointUrl: 'https://api.airtable.com',
-  apiKey: process.env.API_KEY
+  apiKey: SECRETS.API_KEY
 });
 
-const base = Airtable.base(process.env.TREASURY_BASE_ID);
+const base = Airtable.base(SECRETS.TREASURY_BASE_ID);
 const direct_transfers_table = base('Direct Transfers');
 
 module.exports = {
@@ -47,7 +50,8 @@ module.exports = {
 
       await interaction.editReply({ embeds: [embed] });
     } catch (err) {
-      console.log(err);
+      consoleLogger.error(err);
+      discordLogger('Error caught in treasury command.');
     }
   }
 };

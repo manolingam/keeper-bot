@@ -4,6 +4,9 @@ const createServer = require('../server');
 const roleClaim = require('../features/role-claim');
 const molochRoleClaim = require('../features/verify');
 
+const { setDiscordClient } = require('../utils/logger');
+const { SECRETS } = require('../config');
+
 dotenv.config();
 
 module.exports = {
@@ -28,45 +31,44 @@ module.exports = {
     //   .commands.cache.get('881470766019919872')
     //   .delete();
 
-    await client.guilds.cache
-      .get(process.env.GUILD_ID)
-      ?.commands.permissions.set({
-        fullPermissions: [
-          {
-            id: '881590070791008280',
-            permissions: [
-              {
-                id: process.env.MEMBER_ROLE_ID,
-                type: 'ROLE',
-                permission: true
-              }
-            ]
-          },
-          {
-            id: '881590070791008279',
-            permissions: [
-              {
-                id: process.env.MEMBER_ROLE_ID,
-                type: 'ROLE',
-                permission: true
-              }
-            ]
-          },
-          {
-            id: '881590070791008276',
-            permissions: [
-              {
-                id: process.env.MEMBER_ROLE_ID,
-                type: 'ROLE',
-                permission: true
-              }
-            ]
-          }
-        ]
-      });
+    await client.guilds.cache.get(SECRETS.GUILD_ID)?.commands.permissions.set({
+      fullPermissions: [
+        {
+          id: '881590070791008280',
+          permissions: [
+            {
+              id: SECRETS.MEMBER_ROLE_ID,
+              type: 'ROLE',
+              permission: true
+            }
+          ]
+        },
+        {
+          id: '881590070791008279',
+          permissions: [
+            {
+              id: SECRETS.MEMBER_ROLE_ID,
+              type: 'ROLE',
+              permission: true
+            }
+          ]
+        },
+        {
+          id: '881590070791008276',
+          permissions: [
+            {
+              id: SECRETS.MEMBER_ROLE_ID,
+              type: 'ROLE',
+              permission: true
+            }
+          ]
+        }
+      ]
+    });
 
     roleClaim(client);
     molochRoleClaim(client);
+    setDiscordClient(client);
 
     createServer();
   }

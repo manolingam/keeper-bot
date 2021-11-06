@@ -3,13 +3,16 @@ const { MessageEmbed } = require('discord.js');
 const { Client } = require('pg');
 const dotenv = require('dotenv');
 
+const { consoleLogger, discordLogger } = require('../utils/logger');
+const { SECRETS } = require('../config');
+
 dotenv.config();
 
 const client = new Client({
-  user: process.env.PG_USER,
-  host: process.env.PG_HOST,
-  database: process.env.PG_DB,
-  password: process.env.PG_SECRET,
+  user: SECRETS.PG_USER,
+  host: SECRETS.PG_HOST,
+  database: SECRETS.PG_DB,
+  password: SECRETS.PG_SECRET,
   port: 5432
 });
 
@@ -49,7 +52,8 @@ module.exports = {
         .addFields(results);
       await interaction.reply({ embeds: [embed], ephemeral: true });
     } catch (err) {
-      console.log(err);
+      consoleLogger.error(err);
+      discordLogger('Error caught in find email command.');
     }
   }
 };

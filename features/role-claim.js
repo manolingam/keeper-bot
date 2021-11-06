@@ -1,7 +1,9 @@
 const { MessageEmbed } = require('discord.js');
+const { consoleLogger, discordLogger } = require('../utils/logger');
+const { SECRETS } = require('../config');
 
 const handleReaction = (reaction, user, add, emojis) => {
-  if (user.id === process.env.BOT_ID) {
+  if (user.id === SECRETS.BOT_ID) {
     return;
   }
 
@@ -35,70 +37,75 @@ const addReaction = (message, reactions) => {
 };
 
 const roleClaim = (client) => {
-  const startHereChannelID = process.env.START_HERE_CHANNEL_ID;
+  try {
+    const startHereChannelID = SECRETS.START_HERE_CHANNEL_ID;
 
-  const getEmoji = (emojiName) =>
-    client.emojis.cache.find((emoji) => emoji.name === emojiName);
+    const getEmoji = (emojiName) =>
+      client.emojis.cache.find((emoji) => emoji.name === emojiName);
 
-  const swordEmoji = getEmoji('raid');
+    const swordEmoji = getEmoji('raid');
 
-  const emojis = {
-    cleric: 'Cleric (Account Manager)',
-    scribe: 'Scribe (Content Creator)',
-    monk: 'Monk (PM)',
-    healer: 'Healer (Internal Ops)',
-    ranger: 'Ranger (UX Design)',
-    tavern: 'Tavern Keeper (Community)',
-    alchemist: 'Alchemist (DAO Consultant)',
-    hunter: 'Hunter (BizDev)',
-    rogue: 'Rogue (Business Affairs/Legal)',
-    warrior: 'Warrior (FrontEnd Dev)',
-    paladin: 'Paladin (Backend Dev)',
-    archer: 'Archer (Visual Design)',
-    necro: 'Necromancer (DevOps)',
-    dwarf: 'AngryDwarf (Treasury)',
-    druid: 'Druid (Data Science/Analyst)',
-    wizard: 'Wizard (Smart Contracts)'
-  };
+    const emojis = {
+      cleric: 'Cleric (Account Manager)',
+      scribe: 'Scribe (Content Creator)',
+      monk: 'Monk (PM)',
+      healer: 'Healer (Internal Ops)',
+      ranger: 'Ranger (UX Design)',
+      tavern: 'Tavern Keeper (Community)',
+      alchemist: 'Alchemist (DAO Consultant)',
+      hunter: 'Hunter (BizDev)',
+      rogue: 'Rogue (Business Affairs/Legal)',
+      warrior: 'Warrior (FrontEnd Dev)',
+      paladin: 'Paladin (Backend Dev)',
+      archer: 'Archer (Visual Design)',
+      necro: 'Necromancer (DevOps)',
+      dwarf: 'AngryDwarf (Treasury)',
+      druid: 'Druid (Data Science/Analyst)',
+      wizard: 'Wizard (Smart Contracts)'
+    };
 
-  const reactions = [];
+    const reactions = [];
 
-  let emojiText = '';
+    let emojiText = '';
 
-  Object.keys(emojis).forEach((key) => {
-    const emoji = getEmoji(key);
-    reactions.push(emoji);
-    const role = emojis[key];
-    emojiText += `${emoji} - **${role}**\n\n`;
-  });
+    Object.keys(emojis).forEach((key) => {
+      const emoji = getEmoji(key);
+      reactions.push(emoji);
+      const role = emojis[key];
+      emojiText += `${emoji} - **${role}**\n\n`;
+    });
 
-  const channel = client.channels.cache.get(startHereChannelID);
-  const embed = new MessageEmbed()
-    .setColor('#ff3864')
-    .setTitle('Role Selection')
-    .setDescription(
-      `Raise your swords and take up a role champ!\n\n__*Pick the roles which you are good at. Choose as many roles as you like - React with the related emoji.\n\nMade a mistake? You can remove roles at any time, the same way you selected them. Just tap the emoji again and the role will be removed*__.\n\n${swordEmoji} ${swordEmoji} ${swordEmoji} ${swordEmoji} ${swordEmoji}\n\n${emojiText}`
-    );
+    const channel = client.channels.cache.get(startHereChannelID);
+    const embed = new MessageEmbed()
+      .setColor('#ff3864')
+      .setTitle('Role Selection')
+      .setDescription(
+        `Raise your swords and take up a role champ!\n\n__*Pick the roles which you are good at. Choose as many roles as you like - React with the related emoji.\n\nMade a mistake? You can remove roles at any time, the same way you selected them. Just tap the emoji again and the role will be removed*__.\n\n${swordEmoji} ${swordEmoji} ${swordEmoji} ${swordEmoji} ${swordEmoji}\n\n${emojiText}`
+      );
 
-  channel.messages.fetch().then((messages) => {
-    if (messages.size === 1) {
-      channel.send(embed).then((message) => {
-        addReaction(message, reactions);
-      });
-    }
-  });
+    channel.messages.fetch().then((messages) => {
+      if (messages.size === 1) {
+        channel.send(embed).then((message) => {
+          addReaction(message, reactions);
+        });
+      }
+    });
 
-  client.on('messageReactionAdd', (reaction, user) => {
-    if (reaction.message.channel.id === startHereChannelID) {
-      handleReaction(reaction, user, true, emojis);
-    }
-  });
+    client.on('messageReactionAdd', (reaction, user) => {
+      if (reaction.message.channel.id === startHereChannelID) {
+        handleReaction(reaction, user, true, emojis);
+      }
+    });
 
-  client.on('messageReactionRemove', (reaction, user) => {
-    if (reaction.message.channel.id === startHereChannelID) {
-      handleReaction(reaction, user, false, emojis);
-    }
-  });
+    client.on('messageReactionRemove', (reaction, user) => {
+      if (reaction.message.channel.id === startHereChannelID) {
+        handleReaction(reaction, user, false, emojis);
+      }
+    });
+  } catch (err) {
+    consoleLogger.error(err);
+    discordLogger('Error caught in role reactions.');
+  }
 };
 
 module.exports = roleClaim;

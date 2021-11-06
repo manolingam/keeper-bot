@@ -3,6 +3,8 @@ const Discord = require('discord.js');
 const dotenv = require('dotenv');
 
 const { initPgClient, initAirtableClient } = require('../config');
+const { consoleLogger, discordLogger } = require('../utils/logger');
+const { SECRETS } = require('../config');
 
 dotenv.config();
 
@@ -20,6 +22,8 @@ HIREUS_V2_ROUTER.post('/awaiting-raids', async (req, res) => {
     );
     return res.json(rows);
   } catch (err) {
+    consoleLogger.error(err);
+    discordLogger('Error caught in awaiting-raids route.');
     return res.json(err);
   }
 });
@@ -58,7 +62,8 @@ HIREUS_V2_ROUTER.post('/consultation', async (req, res) => {
     const response = await raids_v2_table.create(data);
     res.json(response);
   } catch (err) {
-    console.error(err);
+    consoleLogger.error(err);
+    discordLogger('Error caught in creating a new consultation record.');
     res.json('ERROR');
   }
 
@@ -126,22 +131,12 @@ HIREUS_V2_ROUTER.post('/consultation', async (req, res) => {
       .setTimestamp();
 
     req.CLIENT.guilds.cache
-      .get(process.env.GUILD_ID)
-      .channels.cache.get(process.env.CLIENT_SUBMISSION_CHANNEL_ID)
+      .get(SECRETS.GUILD_ID)
+      .channels.cache.get(SECRETS.CLIENT_SUBMISSION_CHANNEL_ID)
       .send({ embeds: [embed] });
   } catch (err) {
-    console.log('Error', err);
-
-    const embed = new Discord.MessageEmbed()
-      .setColor('#ff3864')
-      .setTitle(
-        'Something went wrong with the recent client submission notification. Check airtable for data.'
-      );
-
-    req.CLIENT.guilds.cache
-      .get(process.env.GUILD_ID)
-      .channels.cache.get(process.env.CLIENT_SUBMISSION_CHANNEL_ID)
-      .send({ embeds: [embed] });
+    consoleLogger.error(err);
+    discordLogger('Error caught in posting client submission notification.');
   }
 });
 
@@ -159,7 +154,8 @@ HIREUS_V2_ROUTER.post('/feedback', async (req, res) => {
 
     res.json('SUCCESS');
   } catch (err) {
-    console.error(err);
+    consoleLogger.error(err);
+    discordLogger('Error caught in posting feedback data to database.');
     res.json('ERROR');
   }
 
@@ -183,11 +179,12 @@ HIREUS_V2_ROUTER.post('/feedback', async (req, res) => {
       );
 
     req.CLIENT.guilds.cache
-      .get(process.env.GUILD_ID)
-      .channels.cache.get(process.env.WHISPERS_CHANNEL_ID)
+      .get(SECRETS.GUILD_ID)
+      .channels.cache.get(SECRETS.WHISPERS_CHANNEL_ID)
       .send({ embeds: [embed] });
   } catch (err) {
-    console.log(err);
+    consoleLogger.error(err);
+    discordLogger('Error caught in posting client submission feedback.');
   }
 });
 

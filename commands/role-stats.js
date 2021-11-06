@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
+const { consoleLogger, discordLogger } = require('../utils/logger');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -51,7 +52,8 @@ module.exports = {
 
       await interaction.reply({ embeds: [embed] });
     } catch (err) {
-      console.log(err);
+      consoleLogger.error(err);
+      discordLogger('Error caught in role stats command.');
     }
   }
 };

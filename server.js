@@ -8,6 +8,9 @@ const ESCROW_ROUTER = require('./routes/escrow');
 
 const subscribeEvent = require('./features/bids');
 
+const { consoleLogger } = require('./utils/logger');
+const { SECRETS } = require('./config');
+
 const createServer = () => {
   const client = new Client({
     partials: ['MESSAGE', 'REACTION', 'CHANNEL'],
@@ -41,7 +44,7 @@ const createServer = () => {
       '/hireus-v2',
       (req, res, next) => {
         req.CLIENT = client;
-        if (req.body.key === process.env.ROUTE_ACCESS_KEY) next();
+        if (req.body.key === SECRETS.ROUTE_ACCESS_KEY) next();
       },
       HIREUS_V2_ROUTER
     );
@@ -59,10 +62,14 @@ const createServer = () => {
       res.send('Hi');
     });
 
-    app.listen(process.env.PORT || 5000, () => console.log('Listening..'));
+    app.listen(process.env.PORT || 5000, () =>
+      consoleLogger.info(
+        `Server Listening on port ${process.env.PORT || 5000}..`
+      )
+    );
   });
 
-  client.login(process.env.TOKEN);
+  client.login(SECRETS.TOKEN);
 };
 
 module.exports = createServer;

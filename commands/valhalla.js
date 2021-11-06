@@ -1,6 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 
+const { consoleLogger, discordLogger } = require('../utils/logger');
+const { SECRETS } = require('../config');
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('to-valhalla')
@@ -17,16 +20,14 @@ module.exports = {
 
       // channel.setParent(process.env.VALHALLA_6_21_CHANNEL_ID);
 
-      if (
-        interaction.channel.parentId === process.env.VALHALLA_6_21_CHANNEL_ID
-      ) {
+      if (interaction.channel.parentId === SECRETS.VALHALLA_6_21_CHANNEL_ID) {
         const embed = new MessageEmbed()
           .setColor('#ff3864')
           .setDescription('This is already in Valhalla!');
 
         await interaction.reply({ embeds: [embed] });
       } else {
-        interaction.channel.setParent(process.env.VALHALLA_6_21_CHANNEL_ID);
+        interaction.channel.setParent(SECRETS.VALHALLA_6_21_CHANNEL_ID);
 
         const embed = new MessageEmbed()
           .setColor('#ff3864')
@@ -35,7 +36,8 @@ module.exports = {
         await interaction.reply({ embeds: [embed] });
       }
     } catch (err) {
-      console.log(err);
+      consoleLogger.error(err);
+      discordLogger('Error caught in valhalla command.');
     }
   }
 };

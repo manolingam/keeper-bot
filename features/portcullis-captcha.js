@@ -2,6 +2,9 @@ const { MessageEmbed } = require('discord.js');
 const randomWords = require('random-words');
 const welcomeMessages = require('../utils/helpers');
 
+const { consoleLogger, discordLogger } = require('../utils/logger');
+const { SECRETS } = require('../config');
+
 const captchaResponse = async (member, message) => {
   try {
     const msg = await member.send({ embeds: [message] });
@@ -13,38 +16,30 @@ const captchaResponse = async (member, message) => {
         time: 60000
       })
       .catch(() => {
-        console.log('Time out');
+        consoleLogger.warn('Captcha timed out');
       });
 
     const reply = collected.first() ? collected.first().content : null;
     return reply;
   } catch (err) {
-    console.log(err);
+    consoleLogger.error(err);
+    discordLogger('Error caught in captcha response.');
     return null;
   }
 };
 
 const entryCheck = async (member) => {
   try {
-    const tavern = member.guild.channels.cache.get(
-      process.env.TAVERN_CHANNEL_ID
-    );
-    const commandCenter = member.guild.channels.cache.get(
-      process.env.COMMAND_CENTER_ID
-    );
+    const tavern = member.guild.channels.cache.get(SECRETS.TAVERN_CHANNEL_ID);
 
-    if (member.user.bot && process.env.ALLOW_BOTS === 'false') {
-      commandCenter.send({
-        content: `Kicked unauthorized bot, <@${member.id}>`
-      });
+    if (member.user.bot && SECRETS.ALLOW_BOTS === 'false') {
+      discordLogger(`Kicked unauthorized bot, <@${member.id}>`);
       member.kick();
       return;
     }
 
-    if (member.user.bot && process.env.ALLOW_BOTS === 'true') {
-      commandCenter.send({
-        content: `Bot <@${member.id}> has entered the tavern`
-      });
+    if (member.user.bot && SECRETS.ALLOW_BOTS === 'true') {
+      discordLogger(`Bot <@${member.id}> has entered the tavern`);
       return;
     }
 
@@ -61,7 +56,7 @@ const entryCheck = async (member) => {
 
     // chance 1
     if (reply === captcha[0]) {
-      member.roles.add(process.env.MOLOCH_SOLDIER_ROLE_ID);
+      member.roles.add(SECRETS.MOLOCH_SOLDIER_ROLE_ID);
       tavern.send({ content: welcomeMessages(member) });
       return;
     }
@@ -75,7 +70,7 @@ const entryCheck = async (member) => {
 
     // chance 2
     if (reply === captcha[0]) {
-      member.roles.add(process.env.MOLOCH_SOLDIER_ROLE_ID);
+      member.roles.add(SECRETS.MOLOCH_SOLDIER_ROLE_ID);
       tavern.send({ content: welcomeMessages(member) });
       return;
     }
@@ -85,12 +80,12 @@ const entryCheck = async (member) => {
         'Sorry, no valid response received within the time. Try joining the server again if you missed it.'
       )
     );
-    commandCenter.send({
-      content: `Kicked <@${member.id}> due to portcullis verification fail.`
-    });
+
+    discordLogger(`Kicked unverified user, <@${member.id}>`);
     member.kick();
   } catch (err) {
-    console.log(err);
+    consoleLogger.error(err);
+    discordLogger('Error caught in entry check.');
   }
 };
 

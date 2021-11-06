@@ -1,7 +1,9 @@
 const Web3 = require('web3');
 const { MessageEmbed } = require('discord.js');
 
-const PairABI = require('../utils/token-abi.json');
+const PairABI = require('../abi/token-abi.json');
+const { consoleLogger, discordLogger } = require('../utils/logger');
+const { SECRETS } = require('../config');
 
 const subscribeEvent = (client) => {
   try {
@@ -34,12 +36,12 @@ const subscribeEvent = (client) => {
           fromBlock: 17921694
         },
         function (error, event) {
-          if (error) console.log(error);
-          if (event) console.log(event);
+          if (error) consoleLogger.error(error);
+          if (event) consoleLogger.info(event);
         }
       )
       .on('connected', function (subscriptionId) {
-        console.log(
+        consoleLogger.info(
           `Connection Opened with subscription ID, ${subscriptionId}!`
         );
       })
@@ -62,15 +64,6 @@ const subscribeEvent = (client) => {
         );
 
         if (parseInt(raid_in, 10) >= 500 || parseInt(raid_out, 10) >= 500) {
-          console.log('event', {
-            hash: event.transactionHash,
-            sender: event.returnValues.sender,
-            'Raid In': raid_in,
-            'WETH Out': weth_out,
-            'WETH In': weth_in,
-            'RAID Out': raid_out
-          });
-
           const embed = new MessageEmbed()
             .setColor('#ff3864')
             .setTitle(
@@ -99,23 +92,17 @@ const subscribeEvent = (client) => {
             .setTimestamp();
 
           client.guilds.cache
-            .get(process.env.GUILD_ID)
-            .channels.cache.get(process.env.RAID_SWAP_ALERT_CHANNEL_ID)
+            .get(SECRETS.GUILD_ID)
+            .channels.cache.get(SECRETS.RAID_SWAP_ALERT_CHANNEL_ID)
             .send({ embeds: [embed] });
         }
       })
       .on('error', function (error, receipt) {
-        if (error) console.log('Error', error);
-        if (receipt) console.log('Receipt', receipt);
+        if (error) consoleLogger.error(error);
+        if (receipt) consoleLogger.info(receipt);
       });
   } catch (err) {
-    const embed = new MessageEmbed()
-      .setColor('#ff3864')
-      .setDescription('Something went wrong with the swap listener.');
-    client.guilds.cache
-      .get(process.env.GUILD_ID)
-      .channels.cache.get(process.env.COMMAND_CENTER_ID)
-      .send({ embeds: [embed] });
+    discordLogger('Error caught in swap listener.');
   }
 };
 

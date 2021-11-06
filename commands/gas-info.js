@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const axios = require('axios');
 
+const { consoleLogger, discordLogger } = require('../utils/logger');
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('gas-info')
@@ -33,7 +35,8 @@ module.exports = {
 
       await interaction.reply({ embeds: [embed] });
     } catch (err) {
-      console.log(err);
+      consoleLogger.error(err);
+      discordLogger('Error caught in gas info command.');
     }
   }
 };

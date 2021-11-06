@@ -1,10 +1,9 @@
 /* eslint-disable global-require */
 /* eslint-disable import/no-dynamic-require */
 const { Collection, Intents, Client } = require('discord.js');
-const dotenv = require('dotenv');
 const fs = require('fs');
 
-dotenv.config();
+const { SECRETS } = require('./config');
 
 // initialize discord client
 const client = new Client({
@@ -41,4 +40,4 @@ eventFiles.forEach((file) => {
   }
 });
 
-client.login(process.env.TOKEN);
+client.login(SECRETS.TOKEN);

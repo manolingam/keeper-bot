@@ -2,6 +2,8 @@ const express = require('express');
 const Discord = require('discord.js');
 
 const { initAirtableClient } = require('../config');
+const { consoleLogger, discordLogger } = require('../utils/logger');
+const { SECRETS } = require('../config');
 
 require('dotenv').config();
 
@@ -13,11 +15,11 @@ ESCROW_ROUTER.post('/validate-raid', async (req, res) => {
   try {
     if (req.body.ID === '') res.json('NOT_FOUND');
     const result = await raids_v2_table.find(req.body.ID);
-
-    console.log('Retrieved', result.id);
     res.json(result.fields);
   } catch (err) {
     if (err.error === 'NOT_FOUND') {
+      consoleLogger.error(err);
+      discordLogger('Error caught in validate-raid route.');
       res.json(err.error);
     }
   }
@@ -34,7 +36,8 @@ ESCROW_ROUTER.post('/update-raid', async (req, res) => {
     await raids_v2_table.update(ID, data);
     res.json('SUCCESS');
   } catch (err) {
-    console.error(err);
+    consoleLogger.error(err);
+    discordLogger('Error caught in update-raid route.');
     res.json('ERROR');
   }
 });
@@ -50,7 +53,8 @@ ESCROW_ROUTER.post('/update-invoice', async (req, res) => {
     await raids_v2_table.update(ID, data);
     res.json('SUCCESS');
   } catch (err) {
-    console.error(err);
+    consoleLogger.error(err);
+    discordLogger('Error caught in update-invoice route.');
     res.json('ERROR');
   }
 });
@@ -75,13 +79,14 @@ ESCROW_ROUTER.post('/notify-spoils', async (req, res) => {
       );
 
     req.CLIENT.guilds.cache
-      .get(process.env.GUILD_ID)
-      .channels.cache.get(process.env.SMART_ESCROW_CHANNEL_ID)
+      .get(SECRETS.GUILD_ID)
+      .channels.cache.get(SECRETS.SMART_ESCROW_CHANNEL_ID)
       .send({ embeds: [embed] });
 
     res.json('SUCCESS');
   } catch (err) {
-    console.log(err);
+    consoleLogger.error(err);
+    discordLogger('Error caught in notify-spoils route.');
     res.json('ERROR');
   }
 });

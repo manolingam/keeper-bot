@@ -6,7 +6,6 @@ dotenv.config();
 
 const SECRETS = {
   ROUTE_ACCESS_KEY: process.env.ROUTE_ACCESS_KEY,
-  MONGO_URI: process.env.MONGO_URI,
   TOKEN: process.env.TOKEN,
   PG_DB: process.env.PG_DB,
   PG_HOST: process.env.PG_HOST,

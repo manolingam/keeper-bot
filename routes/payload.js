@@ -1,7 +1,7 @@
 const express = require('express');
 const Discord = require('discord.js');
 
-const { consoleLogger } = require('../utils/logger');
+const { consoleLogger, discordLogger } = require('../utils/logger');
 const { SECRETS } = require('../config');
 
 const PAYLOAD_ROUTER = express.Router();
@@ -44,6 +44,7 @@ PAYLOAD_ROUTER.post('/', (req, res) => {
     res.send('Received');
   } catch (err) {
     consoleLogger.error(err);
+    discordLogger('Error caught in proposal alert.');
   }
 });
 

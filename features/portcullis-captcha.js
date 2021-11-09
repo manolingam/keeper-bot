@@ -54,6 +54,10 @@ const entryCheck = async (member) => {
         )
     );
 
+    if (reply == null) {
+      return;
+    }
+
     // chance 1
     if (reply === captcha[0]) {
       member.roles.add(SECRETS.MOLOCH_SOLDIER_ROLE_ID);
@@ -67,6 +71,10 @@ const entryCheck = async (member) => {
         'Captcha is invalid. Please try again one last time with a proper captcha. Timer is reset to 1 minute.'
       )
     );
+
+    if (reply == null) {
+      return;
+    }
 
     // chance 2
     if (reply === captcha[0]) {

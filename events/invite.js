@@ -5,7 +5,12 @@ module.exports = {
   name: 'inviteCreate',
   async execute(invite) {
     try {
-      const { inviter } = invite;
+      const { inviter, channel } = invite;
+
+      if (channel.type === 'GUILD_VOICE') {
+        return;
+      }
+
       if (inviter.id !== SECRETS.BOT_ID) {
         discordLogger(
           'Deleted unauthorized invite creation. Use `/create-invite` instead ' +

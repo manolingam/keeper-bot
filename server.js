@@ -5,6 +5,7 @@ const cors = require('cors');
 const PAYLOAD_ROUTER = require('./routes/payload');
 const HIREUS_V2_ROUTER = require('./routes/hireus-v2');
 const ESCROW_ROUTER = require('./routes/escrow');
+const JOINUS_ROUTER = require('./routes/joinus');
 
 const subscribeEvent = require('./features/bids');
 
@@ -47,6 +48,15 @@ const createServer = () => {
         if (req.body.key === SECRETS.ROUTE_ACCESS_KEY) next();
       },
       HIREUS_V2_ROUTER
+    );
+
+    app.use(
+      '/joinus',
+      (req, res, next) => {
+        req.CLIENT = client;
+        if (req.body.key === SECRETS.ROUTE_ACCESS_KEY) next();
+      },
+      JOINUS_ROUTER
     );
 
     app.use(

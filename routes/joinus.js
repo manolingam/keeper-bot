@@ -9,9 +9,6 @@ dotenv.config();
 
 const JOINUS_ROUTER = express.Router();
 
-const trimString = (str, max) =>
-  str.length > max ? `${str.slice(0, max - 3)}...` : str;
-
 JOINUS_ROUTER.post('/application', async (req, res) => {
   const {
     name,
@@ -20,10 +17,7 @@ JOINUS_ROUTER.post('/application', async (req, res) => {
     primary_skills,
     class_type,
     crypto_exp,
-    availability,
-    bio,
-    goals,
-    passion
+    availability
   } = req.body;
 
   try {
@@ -43,18 +37,6 @@ JOINUS_ROUTER.post('/application', async (req, res) => {
         {
           name: 'Class Type',
           value: class_type
-        },
-        {
-          name: 'Bio',
-          value: trimString(bio, 1024)
-        },
-        {
-          name: 'Goals',
-          value: trimString(goals, 1024)
-        },
-        {
-          name: 'Passion',
-          value: trimString(passion, 1024)
         },
         {
           name: 'Experience in Crypto',

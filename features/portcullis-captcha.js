@@ -54,10 +54,6 @@ const entryCheck = async (member) => {
         )
     );
 
-    if (reply == null) {
-      return;
-    }
-
     // chance 1
     if (reply === captcha[0]) {
       member.roles.add(SECRETS.MOLOCH_SOLDIER_ROLE_ID);
@@ -72,10 +68,6 @@ const entryCheck = async (member) => {
       )
     );
 
-    if (reply == null) {
-      return;
-    }
-
     // chance 2
     if (reply === captcha[0]) {
       member.roles.add(SECRETS.MOLOCH_SOLDIER_ROLE_ID);
@@ -83,11 +75,13 @@ const entryCheck = async (member) => {
       return;
     }
 
-    member.send(
-      new MessageEmbed().setDescription(
-        'Sorry, no valid response received within the time. Try joining the server again if you missed it.'
-      )
-    );
+    member.send({
+      embeds: [
+        new MessageEmbed().setDescription(
+          'Sorry, no valid response received within the time. Try joining the server again if you missed it.'
+        )
+      ]
+    });
 
     discordLogger(`Kicked unverified user, <@${member.id}>`);
     member.kick();

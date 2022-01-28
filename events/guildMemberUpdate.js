@@ -13,7 +13,7 @@ module.exports = {
         const embed = new MessageEmbed()
           .setColor('#ff3864')
           .setDescription(
-            `New member! Welcome to the Guild, ${newMember.user.username}!`
+            `New member! Welcome to the Guild, <@${newMember.id}>!`
           );
 
         const channel = newMember.client.channels.cache.get(
